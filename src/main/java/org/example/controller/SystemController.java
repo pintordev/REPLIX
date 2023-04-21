@@ -26,11 +26,14 @@ public class SystemController {
         // 로그인 상태에서 컨텐츠 게시판 접속 상태일 때
         if (Container.session.getSessionState() == 3) {
             System.out.println("https://replix.io/contents/review\n\n");
+//            adComment();
             System.out.printf("  %d. 리뷰확인하기\n", menuCount++);
             System.out.printf("  %d. 리뷰남기기\n", menuCount++);
             System.out.printf("  %d. 돌아가기\n", menuCount);
         }
-        System.out.println("  0. 종료");
+        if (Container.session.getSessionState() == 0 || Container.session.getSessionState() == 1) {
+            System.out.println("  0. 종료");
+        }
     }
 
     public String getCommand() {
@@ -40,6 +43,9 @@ public class SystemController {
     }
 
     public void exit() {
+        if (Container.session.getSessionState() != 0 && Container.session.getSessionState() != 1) {
+            return;
+        }
         System.out.println("-".repeat(24));
         System.out.println("  REPLIX 앱을 종료합니다.");
         Container.session.logout();
@@ -49,5 +55,11 @@ public class SystemController {
     public void commandError() {
         System.out.println("-".repeat(24));
         System.out.println("  올바르지 않은 입력입니다.");
+    }
+
+    public void adComment() {
+        System.out.println("=".repeat(50));
+        System.out.println("\n        LostArk 스케쥴은 LSS에서!\n");
+        System.out.println("=".repeat(50));
     }
 }

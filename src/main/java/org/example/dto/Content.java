@@ -12,8 +12,8 @@ public class Content {
     private String productionCompany; // 컨텐츠 제작사
     private String director; // 컨텐츠 제작자
     private String plot; // 컨텐츠 줄거리
-    private String contentGenre; // 컨텐츠 장르
-    private String serviceOtt; // 컨텐츠 OTT
+    private String genre; // 컨텐츠 장르
+//    private String serviceOtt; // 컨텐츠 OTT
     // 장르, OTT 등은 어떻게 할지에 대한 해결 필요.. ArrayList?
 
     public Content(Map<String, Object> contentMap) {
@@ -23,7 +23,7 @@ public class Content {
         this.productionCompany = (String) contentMap.get("productionCompany");
         this.director = (String) contentMap.get("director");
         this.plot = (String) contentMap.get("plot");
-        this.contentGenre = (String) contentMap.get("contentGenre");
-        this.serviceOtt = (String) contentMap.get("serviceOtt");
+        this.genre = (String) contentMap.get("genre");
+//        this.serviceOtt = (String) contentMap.get("serviceOtt");
     }
 }
