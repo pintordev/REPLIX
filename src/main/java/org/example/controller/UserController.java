@@ -2,6 +2,7 @@ package org.example.controller;
 
 import org.example.Container;
 import org.example.dto.User;
+import org.example.service.UserService;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -9,6 +10,7 @@ import java.util.Map;
 
 public class UserController {
     private ArrayList<User> userList;
+    private UserService userService;
 
     public UserController() {
         this.userList = new ArrayList<>();
@@ -89,7 +91,114 @@ public class UserController {
     }
 
     public void signUp() {
-        System.out.println("  기능 구현 예정입니다.");
+        String loginId;
+        String loginPw;
+        String loginPwConfirm;
+        String name;
+        String birthDate;
+        String gender;
+        String e_mail;
+
+        while (true){
+            System.out.println("사용하실 로그인 아이디를 입력해주세요. : ");
+            loginId = Container.scanner.nextLine().trim();
+
+            if(loginId.length() == 0){
+                System.out.println("로그인 아이디를 입력하지 않았습니다. ");
+                continue;
+            }
+
+            boolean isLoginIdDup = userService.isLoginDup(loginId);
+
+            if(isLoginIdDup){
+                System.out.println(loginId + "(은)는 이미 사용중인 아이디입니다.");
+                continue;
+            }
+            break;
+        }
+
+        while (true){
+            System.out.println("사용하실 로그인 비밀번호를 입력해주세요. : ");
+            loginPw = Container.scanner.nextLine().trim();
+
+            if(loginPw.length() == 0){
+                System.out.println("로그인 비밀번호를 입력하지 않았습니다.");
+                continue;
+            }
+
+            boolean loginPwConfirmIssame = true;
+
+            while (true){
+                System.out.println("로그인 비밀번호를 확인합니다.");
+                loginPwConfirm = Container.scanner.nextLine().trim();
+
+                if(loginPwConfirm.length()==0){
+                    System.out.println("비밀번호를 입력하지 않았습니다.");
+                    continue;
+                }
+
+                if(loginPw.equals(loginPwConfirm) == false){
+                    System.out.println("입력하신 비밀번호가 일치하지 않습니다.");
+                    loginPwConfirmIssame = false;
+                    break;
+                }
+            break;
+            }
+            if(loginPwConfirmIssame){
+                break;
+            }
+        }
+
+        while (true){
+            System.out.printf("이름 : ");
+            name = Container.scanner.nextLine().trim();
+
+            if(name.length()==0){
+                System.out.println("이름을 입력하지 않았습니다.");
+                continue;
+            }
+            break;
+        }
+
+        while (true){
+            System.out.printf("생년월일 : ");
+            birthDate = Container.scanner.nextLine().trim();
+
+            if(birthDate.length()==0){
+                System.out.println("생년월일을 입력하지 않았습니다.");
+                continue;
+            }
+            break;
+        }
+
+        while (true){
+            System.out.printf("성별 : ");
+            gender = Container.scanner.nextLine().trim();
+
+            if(gender.length()==0){
+                System.out.println("성별을 입력하지 않았습니다.");
+                continue;
+            }
+            break;
+        }
+
+        while (true){
+            System.out.printf("이메일주소 : ");
+            e_mail = Container.scanner.nextLine().trim();
+
+            if(e_mail.length()==0){
+                System.out.println("이메일주소를 입력하지 않았습니다.");
+                continue;
+            }
+            break;
+        }
+
+
+        int id = userService.signUp(loginId, loginPw, name, birthDate, gender, e_mail);
+
+
+
+
     }
 
 
@@ -97,3 +206,4 @@ public class UserController {
         System.out.println("  기능 구현 예정입니다.");
     }
 }
+
