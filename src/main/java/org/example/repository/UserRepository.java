@@ -15,7 +15,7 @@ public class UserRepository {
         return DBUtil.selectRowBooleanValue(Container.connection, sql);
     }
 
-    public int signUp(String loginId, String loginPw, String name, String birthDate, String gender, String e_mail){
+    public int signUp(String loginId, String loginPw, String name, String birthDate, String gender, String email){
         SecSql sql = new SecSql();
         sql.append("INSERT INTO `user`");
         sql.append("SET regDate = NOW()");
@@ -25,7 +25,7 @@ public class UserRepository {
         sql.append(", name = ?", name);
         sql.append(", birthDate = ?", birthDate);
         sql.append(", gender = ?", gender);
-        sql.append(", e_mail = ?", e_mail);
+        sql.append(", email = ?", email);
 
         int id = DBUtil.insert(Container.connection, sql);
 

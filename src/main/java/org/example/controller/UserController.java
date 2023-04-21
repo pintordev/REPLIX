@@ -14,7 +14,7 @@ public class UserController {
 
     public UserController() {
         this.userList = new ArrayList<>();
-
+        this.userService = new UserService();
         Map<String, Object> userMap = new HashMap<>();
 
         userMap.put("id", 1);
@@ -97,7 +97,7 @@ public class UserController {
         String name;
         String birthDate;
         String gender;
-        String e_mail;
+        String email;
 
         while (true){
             System.out.println("사용하실 로그인 아이디를 입력해주세요. : ");
@@ -184,9 +184,9 @@ public class UserController {
 
         while (true){
             System.out.printf("이메일주소 : ");
-            e_mail = Container.scanner.nextLine().trim();
+            email = Container.scanner.nextLine().trim();
 
-            if(e_mail.length()==0){
+            if(email.length()==0){
                 System.out.println("이메일주소를 입력하지 않았습니다.");
                 continue;
             }
@@ -194,7 +194,7 @@ public class UserController {
         }
 
 
-        int id = userService.signUp(loginId, loginPw, name, birthDate, gender, e_mail);
+        int id = userService.signUp(loginId, loginPw, name, birthDate, gender, email);
 
 
 
