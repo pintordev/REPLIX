@@ -63,31 +63,50 @@ public class UserController {
         System.out.println("  아이디를 입력해주세요.");
         System.out.printf("  >> ");
         String loginId = Container.scanner.nextLine().trim();
-        System.out.println("  비밀번호를 입력해주세요.");
-        System.out.printf("  >> ");
-        String loginPw = Container.scanner.nextLine().trim();
-        System.out.println("-".repeat(24));
 
-        if (this.findByLoginId(loginId) == null) {
+        User user = userService.findByLoginId(loginId);
+
+        if(user == null){
             System.out.println("  존재하지 않는 아이디입니다."); // 아이디가 다르면
             System.out.println("  REPLIX 앱 로그인에 실패하였습니다."); // 두 경우 모두 이 구문은 출력'
             return;
         }
 
-        if (this.findByLoginPw(loginPw) == null) {
-            System.out.println("  올바르지 않은 비밀번호입니다."); // 비밀번호가 다르면
-            System.out.println("  REPLIX 앱 로그인에 실패하였습니다."); // 두 경우 모두 이 구문은 출력
-            return;
-        }
+        int loginlimit = 3;
+        int loginTry = 0 ;
 
-        System.out.println("  REPLIX 앱 로그인에 성공하였습니다.");
-        System.out.printf("  %s님 환영합니다.\n", this.findByLoginId(loginId).getName());
-        Container.session.login(this.findByLoginId(loginId));
+        while (true){
+
+            System.out.println("  비밀번호를 입력해주세요.");
+            System.out.printf("  >> ");
+            String loginPw = Container.scanner.nextLine().trim();
+
+            if(loginTry == loginlimit){
+                System.out.println("  REPLIX 앱 로그인에 실패하였습니다.");
+                System.out.println("비밀번호 5회 오류 비밀번호 확인 후 다음에 다시 시도해주세요");
+                break;
+            }
+            if(user.getLoginPw().equals(loginPw)== false){
+                System.out.println("  올바르지 않은 비밀번호입니다."); // 비밀번호가 다르면
+                System.out.println("-".repeat(24));
+                loginTry++;
+                continue;
+            }else if(user.getLoginPw().equals(loginPw)==true){
+                System.out.println("  REPLIX 앱 로그인에 성공하였습니다.");
+            }
+
+            System.out.printf("  %s님 환영합니다.\n", user.getName());
+            Container.session.login(user);
+            break;
+        }
     }
+
+
 
     public void logout() {
         System.out.println("  REPLIX 앱에서 로그아웃합니다.");
         Container.session.logout();
+        System.out.println("로그아웃 되었습니다.");
     }
 
     public void signUp() {
@@ -108,9 +127,14 @@ public class UserController {
                 continue;
             }
 
-            boolean isLoginIdDup = userService.isLoginDup(loginId);
+            if(loginId.matches(".*[ㄱ-ㅎㅏ-ㅣ가-힣]+.*")){
+                System.out.println("아이디는 영문 또는 숫자로만 생성할 수 있습니다.");
+                continue;
+            }
 
-            if(isLoginIdDup){
+            boolean duplicateId = userService.duplicateId(loginId);
+
+            if(duplicateId){
                 System.out.println(loginId + "(은)는 이미 사용중인 아이디입니다.");
                 continue;
             }

@@ -1,6 +1,8 @@
 package org.example.service;
 
 
+import org.example.dto.User;
+
 import static org.example.Container.userRepository;
 
 public class UserService {
@@ -11,7 +13,13 @@ public class UserService {
         return userRepository.signUp(loginId, loginPw, name, birthDate, gender, email);
     }
 
-    public static boolean isLoginDup(String loginId) {
-        return userRepository.isLoginIdDup(loginId);
+    public static boolean duplicateId(String loginId) {
+        return userRepository.duplicateId(loginId);
     }
+
+    public User findByLoginId(String lginId){
+        return  userRepository.findByLoginId(lginId);
+    }
+
+
 }
