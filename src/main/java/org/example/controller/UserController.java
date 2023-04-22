@@ -69,6 +69,7 @@ public class UserController {
         if(user == null){
             System.out.println("  존재하지 않는 아이디입니다."); // 아이디가 다르면
             System.out.println("  REPLIX 앱 로그인에 실패하였습니다."); // 두 경우 모두 이 구문은 출력'
+            login();
             return;
         }
 
@@ -87,7 +88,7 @@ public class UserController {
                 break;
             }
             if(user.getLoginPw().equals(loginPw)== false){
-                System.out.println("  올바르지 않은 비밀번호입니다."); // 비밀번호가 다르면
+                System.out.println("  일치하지 않은 비밀번호입니다."); // 비밀번호가 다르면
                 System.out.println("-".repeat(24));
                 loginTry++;
                 continue;
@@ -119,6 +120,7 @@ public class UserController {
         String email;
 
         while (true){
+            System.out.println("-".repeat(24));
             System.out.println("사용하실 로그인 아이디를 입력해주세요. : ");
             loginId = Container.scanner.nextLine().trim();
 
@@ -128,7 +130,8 @@ public class UserController {
             }
 
             if(loginId.matches(".*[ㄱ-ㅎㅏ-ㅣ가-힣]+.*")){
-                System.out.println("아이디는 영문 또는 숫자로만 생성할 수 있습니다.");
+                System.out.println("아이디는 영문 또는 숫자로만 입력해주세요.");
+
                 continue;
             }
 
@@ -142,11 +145,18 @@ public class UserController {
         }
 
         while (true){
+            System.out.println("-".repeat(24));
             System.out.println("사용하실 로그인 비밀번호를 입력해주세요. : ");
             loginPw = Container.scanner.nextLine().trim();
 
             if(loginPw.length() == 0){
                 System.out.println("로그인 비밀번호를 입력하지 않았습니다.");
+                continue;
+            }else if(loginPw.matches(".*[ㄱ-ㅎㅏ-ㅣ가-힣]+.*")){
+                System.out.println("로그인 비밀번호는 영문 또는 숫자로만 입력해주세요. ");
+                continue;
+            }else if(loginPw.length() < 8){
+                System.out.println("비밀번호는 8글자 이상으로 입력해주세요.");
                 continue;
             }
 
