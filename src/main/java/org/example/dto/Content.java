@@ -18,6 +18,7 @@ public class Content {
     private int like;
     private int dibs;
     private int review;
+    private double score;
 
     public Content(Map<String, Object> contentMap) {
         this.id = (int) contentMap.get("id");
@@ -32,5 +33,6 @@ public class Content {
         this.like = (int) contentMap.get("like");
         this.dibs = (int) contentMap.get("dibs");
         this.review = (int) contentMap.get("review");
+        this.score = (double) contentMap.get("score");
     }
 }

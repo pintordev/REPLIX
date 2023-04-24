@@ -14,9 +14,29 @@ public class Session {
     private int sessionState;
     private User sessionUser;
     private Content sessionContent;
+    private int sessionReviewPage;
+    private int sessionReviewItemsPerPage;
 
     public Session() {
         this.sessionState = 0;
+        this.sessionReviewPage = 1;
+        this.sessionReviewItemsPerPage = 5;
+    }
+
+    public int getSessionReviewPage() {
+        return sessionReviewPage;
+    }
+
+    public void setSessionReviewPage(int sessionReviewPage) {
+        this.sessionReviewPage = sessionReviewPage;
+    }
+
+    public int getSessionReviewItemsPerPage() {
+        return sessionReviewItemsPerPage;
+    }
+
+    public void setSessionReviewItemsPerPage(int sessionReviewItemsPerPage) {
+        this.sessionReviewItemsPerPage = sessionReviewItemsPerPage;
     }
 
     public int getSessionState() {

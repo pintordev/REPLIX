@@ -63,7 +63,6 @@ public class App {
                 break;
             case "컨텐츠검색":
                 Container.contentController.search();
-                Container.contentController.detail();
                 break;
             case "좋아요누르기":
                 Container.contentController.like();
@@ -82,7 +81,19 @@ public class App {
                 Container.contentController.detail();
                 break;
             case "리뷰확인하기":
-                Container.reviewController.list();
+                Container.reviewController.pagedList();
+                break;
+            case "이전페이지":
+                Container.reviewController.prevPage();
+                break;
+            case "다음페이지":
+                Container.reviewController.nextPage();
+                break;
+            case "리뷰남기기":
+                Container.reviewController.post();
+                break;
+            case "리뷰삭제하기":
+                Container.reviewController.delete();
                 break;
             case "돌아가기":
                 Container.systemController.goBack();

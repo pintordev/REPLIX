@@ -33,13 +33,13 @@ public class SystemController {
         }
         // 로그인 상태에서 리뷰 게시판 접속 상태일 때
         if (Container.session.getSessionState() == 4) {
-            System.out.println("https://replix.io/contents?id=%d&review?page=\n\n");
 //            adComment();
             System.out.printf("  %d. 리뷰평가하기\n", menuCount++);
-            System.out.printf("  %d. 이전페이지\n", menuCount++);
-            System.out.printf("  %d. 다음페이지\n", menuCount);
+            System.out.printf("  %d. 리뷰삭제하기\n", menuCount++);
+            if(Container.session.getSessionReviewPage() > 1) System.out.printf("  %d. 이전페이지\n", menuCount++);
+            if(Container.reviewController.hasNextPage()) System.out.printf("  %d. 다음페이지\n", menuCount);
         }
-        if (Container.session.getSessionState() == 1 || Container.session.getSessionState() == 2) {
+        if (Container.session.getSessionState() == 0 || Container.session.getSessionState() == 1) {
             System.out.println("  0. 종료");
         }
         if (Container.session.getSessionState() == 2 || Container.session.getSessionState() == 3 || Container.session.getSessionState() == 4) {
@@ -79,11 +79,7 @@ public class SystemController {
 
         if (sessionState < 2) return;
 
-        if (sessionState == 4) {
-            Container.session.setSessionState(3);
-            return;
-        }
-
+        Container.session.setSessionReviewPage(1);
         Container.session.setSessionState(1);
     }
 }

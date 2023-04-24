@@ -15,9 +15,6 @@ public class ContentController {
         System.out.printf("  >> ");
         String searchKeyward = Container.scanner.nextLine().trim();
 
-        System.out.println("-".repeat(24));
-        System.out.printf("  입력하신 검색어 \"%s\"에 대한 검색 결과...\n\n", searchKeyward);
-
         SecSql sql = new SecSql();
 
         sql.append("SELECT A.`id`, A.`name`, A.`releaseDate`, A.`productionCompany`, A.`director`, A.`plot`");
@@ -75,13 +72,33 @@ public class ContentController {
 
         List<Map<String, Object>> contentMapListD = DBUtil.selectRows(Container.connection, sql);
 
-        List<Content> contentList = new ArrayList<>();
+        sql = new SecSql();
+
+        sql.append("SELECT IFNULL(AVG(B.`score`), 0) AS 'score'");
+        sql.append("FROM `content` AS A");
+        sql.append("LEFT JOIN `review` as B");
+        sql.append("ON A.`id` = B.`contentId`");
+        sql.append("WHERE A.`name` Like CONCAT('%', ?, '%')", searchKeyward);
+        sql.append("GROUP BY A.`id`");
+
+        List<Map<String, Object>> contentMapListE = DBUtil.selectRows(Container.connection, sql);
 
         for (int i = 0; i < contentMapList.size(); i++) {
             contentMapList.get(i).putAll(contentMapListB.get(i));
             contentMapList.get(i).putAll(contentMapListC.get(i));
             contentMapList.get(i).putAll(contentMapListD.get(i));
+            contentMapList.get(i).putAll(contentMapListE.get(i));
         }
+
+        if(contentMapList.isEmpty()) {
+            System.out.printf("  입력하신 검색어 \"%s\"에 대한 검색 결과가 존재하지 않습니다.\n", searchKeyward);
+            return;
+        }
+
+        System.out.println("-".repeat(24));
+        System.out.printf("  입력하신 검색어 \"%s\"에 대한 검색 결과...\n\n", searchKeyward);
+
+        List<Content> contentList = new ArrayList<>();
 
         for (Map<String, Object> contentMap : contentMapList) {
             contentList.add(new Content(contentMap));
@@ -111,6 +128,7 @@ public class ContentController {
 
                 System.out.printf("  \"%s\" 컨텐츠 게시판으로 이동합니다...\n\n", searchedContent.getName());
                 Container.session.setSessionContent(searchedContent);
+                detail();
                 break;
 
             } catch (InputMismatchException e) {
@@ -130,7 +148,7 @@ public class ContentController {
         System.out.printf("  개요: %s\n", content.getPlot());
         System.out.printf("  릴리즈: %s\n", content.getReleaseDate());
         System.out.printf("  OTT: %s\n", content.getOtt());
-        System.out.printf("  리뷰: %d / 좋아요(%s): %d / 찜(%s): %d\n", content.getReview(), isUserLike() ? "♥" : "♡", content.getLike(), isUserDibs() ? "★" : "☆", content.getDibs());
+        System.out.printf("  별점: %.1f / 리뷰: %d / 좋아요(%s): %d / 찜(%s): %d\n", content.getScore(), content.getReview(), isUserLike() ? "♥" : "♡", content.getLike(), isUserDibs() ? "★" : "☆", content.getDibs());
 
         Container.session.goToContent();
     }
@@ -278,9 +296,21 @@ public class ContentController {
 
         Map<String, Object> contentMapD = DBUtil.selectRow(Container.connection, sql);
 
+        sql = new SecSql();
+
+        sql.append("SELECT IFNULL(AVG(B.`score`), 0) AS 'score'");
+        sql.append("FROM `content` AS A");
+        sql.append("LEFT JOIN `review` as B");
+        sql.append("ON A.`id` = B.`contentId`");
+        sql.append("WHERE A.`id` = ?", Container.session.getSessionContent().getId());
+        sql.append("GROUP BY A.`id`");
+
+        Map<String, Object> contentMapE = DBUtil.selectRow(Container.connection, sql);
+
         contentMap.putAll(contentMapB);
         contentMap.putAll(contentMapC);
         contentMap.putAll(contentMapD);
+        contentMap.putAll(contentMapE);
 
         Container.session.setSessionContent(new Content(contentMap));
     }
