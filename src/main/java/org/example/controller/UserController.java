@@ -233,6 +233,7 @@ public class UserController {
 
         while (true){
             userService.printGenre();
+            System.out.println("-".repeat(24));
             System.out.println("선호하시는 장르를 입력해주세요.");
             inputGenre = Container.scanner.nextLine().trim();
 
