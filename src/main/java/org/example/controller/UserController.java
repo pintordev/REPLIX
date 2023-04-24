@@ -263,6 +263,15 @@ public class UserController {
 
     }
 
+    public void getUserInformation(){
+        if(Container.session.getSessionState()>0){
+            System.out.println("회원정보");
+            userService.getUserInformation();
+
+
+        }
+    }
+
 
     public void modify() {
        if(Container.session.getSessionState()!=1){

@@ -67,6 +67,8 @@ public class App {
             case "개인정보수정":
                 Container.userController.modify();
                 break;
+            case "회원정보확인" :
+                Container.userController.getUserInformation();
             default:
                 Container.systemController.commandError();
                 break;

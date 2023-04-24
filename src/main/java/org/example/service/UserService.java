@@ -46,4 +46,8 @@ public class UserService {
         userRepository.genreSignup(userId, genreId);
     }
 
+    public void getUserInformation(){
+        userRepository.getUserInformation();
+    }
+
 }

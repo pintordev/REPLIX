@@ -114,6 +114,19 @@ public class UserRepository {
         DBUtil.update(Container.connection, sql);
     }
 
+    public void getUserInformation(){
+        User user = Container.session.sessionUser;
+        System.out.println("이름 : " + user.getName());
+        System.out.println("생년월일 : " + user.getBirthDate());
+        System.out.println("성별 : "+user.getGender());
+        System.out.println("이메일 : "+user.getEmail());
+        System.out.println("가입일 : "+user.getRegDate());
+
+
+    }
+
+
+
 
 
 
