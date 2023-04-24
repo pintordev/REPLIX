@@ -25,14 +25,25 @@ public class SystemController {
         }
         // 로그인 상태에서 컨텐츠 게시판 접속 상태일 때
         if (Container.session.getSessionState() == 3) {
-            System.out.println("https://replix.io/contents/review\n\n");
 //            adComment();
             System.out.printf("  %d. 리뷰확인하기\n", menuCount++);
             System.out.printf("  %d. 리뷰남기기\n", menuCount++);
-            System.out.printf("  %d. 돌아가기\n", menuCount);
+            System.out.printf("  %d. 좋아요%s\n", menuCount++, Container.contentController.isUserLike() ? "취소하기" : "누르기");
+            System.out.printf("  %d. 찜%s하기\n", menuCount++, Container.contentController.isUserDibs() ? "취소" : "");
         }
-        if (Container.session.getSessionState() == 0 || Container.session.getSessionState() == 1) {
+        // 로그인 상태에서 리뷰 게시판 접속 상태일 때
+        if (Container.session.getSessionState() == 4) {
+            System.out.println("https://replix.io/contents?id=%d&review?page=\n\n");
+//            adComment();
+            System.out.printf("  %d. 리뷰평가하기\n", menuCount++);
+            System.out.printf("  %d. 이전페이지\n", menuCount++);
+            System.out.printf("  %d. 다음페이지\n", menuCount);
+        }
+        if (Container.session.getSessionState() == 1 || Container.session.getSessionState() == 2) {
             System.out.println("  0. 종료");
+        }
+        if (Container.session.getSessionState() == 2 || Container.session.getSessionState() == 3 || Container.session.getSessionState() == 4) {
+            System.out.println("  0. 돌아가기");
         }
     }
 
@@ -61,5 +72,18 @@ public class SystemController {
         System.out.println("=".repeat(50));
         System.out.println("\n        LostArk 스케쥴은 LSS에서!\n");
         System.out.println("=".repeat(50));
+    }
+
+    public void goBack() {
+        int sessionState = Container.session.getSessionState();
+
+        if (sessionState < 2) return;
+
+        if (sessionState == 4) {
+            Container.session.setSessionState(3);
+            return;
+        }
+
+        Container.session.setSessionState(1);
     }
 }

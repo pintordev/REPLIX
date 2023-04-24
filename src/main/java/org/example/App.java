@@ -63,6 +63,29 @@ public class App {
                 break;
             case "컨텐츠검색":
                 Container.contentController.search();
+                Container.contentController.detail();
+                break;
+            case "좋아요누르기":
+                Container.contentController.like();
+                Container.contentController.detail();
+                break;
+            case "좋아요취소하기":
+                Container.contentController.cancelLike();
+                Container.contentController.detail();
+                break;
+            case "찜하기":
+                Container.contentController.dibs();
+                Container.contentController.detail();
+                break;
+            case "찜취소하기":
+                Container.contentController.cancelDibs();
+                Container.contentController.detail();
+                break;
+            case "리뷰확인하기":
+                Container.reviewController.list();
+                break;
+            case "돌아가기":
+                Container.systemController.goBack();
                 break;
             default:
                 Container.systemController.commandError();

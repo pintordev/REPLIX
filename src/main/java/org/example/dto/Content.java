@@ -13,8 +13,11 @@ public class Content {
     private String director; // 컨텐츠 제작자
     private String plot; // 컨텐츠 줄거리
     private String genre; // 컨텐츠 장르
-//    private String serviceOtt; // 컨텐츠 OTT
-    // 장르, OTT 등은 어떻게 할지에 대한 해결 필요.. ArrayList?
+    private String ott; // 컨텐츠 OTT
+    private String cast; // 컨텐츠 출연진
+    private int like;
+    private int dibs;
+    private int review;
 
     public Content(Map<String, Object> contentMap) {
         this.id = (int) contentMap.get("id");
@@ -24,6 +27,10 @@ public class Content {
         this.director = (String) contentMap.get("director");
         this.plot = (String) contentMap.get("plot");
         this.genre = (String) contentMap.get("genre");
-//        this.serviceOtt = (String) contentMap.get("serviceOtt");
+        this.ott = (String) contentMap.get("ott");
+        this.cast = (String) contentMap.get("cast");
+        this.like = (int) contentMap.get("like");
+        this.dibs = (int) contentMap.get("dibs");
+        this.review = (int) contentMap.get("review");
     }
 }
