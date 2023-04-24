@@ -205,18 +205,11 @@ public class UserController {
                 continue;
             }
 
-
             break;
         }
 
-
-
-
         int id = userService.signUp(loginId, loginPw, name, birthDate, gender, email);
         userService.genreSignup(id, userService.findGenreIdByName(inputGenre));
-
-
-
 
     }
 
@@ -224,14 +217,11 @@ public class UserController {
         if(Container.session.getSessionState()>0){
             System.out.println("회원정보");
             userService.getUserInformation();
-
-
         }
     }
 
-
     public void modify() {
-        if(Container.session.getSessionState()!=1){
+        if(Container.session.getSessionState()!= 2){
             Container.systemController.commandError();
             return;
         }
@@ -270,16 +260,11 @@ public class UserController {
                     continue;
                 }
 
-                userService.update(newPw,newEmail);
+                userService.update(newPw, newEmail);
                 System.out.println("개인정보변경이 완료되었습니다.");
                 break;
             }
 
         }
     }
-
-    public void myPage(){
-
-    }
-
 }

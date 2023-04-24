@@ -107,8 +107,8 @@ public class UserRepository {
 
         sql.append("UPDATE `user`");
         sql.append("SET updateDate = NOW()");
-        sql.append(",loginPw = ?", newPw);
-        sql.append(",email = ?", newEmail);
+        sql.append(", loginPw = ?", newPw);
+        sql.append(", email = ?", newEmail);
         sql.append("WHERE `id` = ?", Container.session.getSessionUser().getId());
 
         DBUtil.update(Container.connection, sql);
@@ -121,7 +121,5 @@ public class UserRepository {
         System.out.println("성별 : "+user.getGender());
         System.out.println("이메일 : "+user.getEmail());
         System.out.println("가입일 : "+user.getRegDate());
-
-
     }
 }

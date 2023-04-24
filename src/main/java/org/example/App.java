@@ -59,7 +59,7 @@ public class App {
                 Container.userController.signUp();
                 break;
             case "마이페이지":
-                Container.userController.myPage();
+                Container.session.goToMyPage();
                 break;
             case "컨텐츠검색":
                 Container.contentController.search();
@@ -97,6 +97,12 @@ public class App {
                 break;
             case "돌아가기":
                 Container.systemController.goBack();
+                break;
+            case "회원정보확인":
+                Container.userController.getUserInformation();
+                break;
+            case "회원정보수정":
+                Container.userController.modify();
                 break;
             default:
                 Container.systemController.commandError();

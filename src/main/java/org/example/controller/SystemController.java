@@ -23,6 +23,12 @@ public class SystemController {
             System.out.printf("  %d. 마이페이지\n", menuCount++);
             System.out.printf("  %d. 컨텐츠검색\n", menuCount);
         }
+        if (Container.session.getSessionState() == 2) {
+            System.out.println("https://replix.io/mypage\n\n");
+            System.out.println("       [ REPLIX ]       ");
+            System.out.printf("  %d. 회원정보확인\n", menuCount++);
+            System.out.printf("  %d. 회원정보수정\n", menuCount);
+        }
         // 로그인 상태에서 컨텐츠 게시판 접속 상태일 때
         if (Container.session.getSessionState() == 3) {
 //            adComment();

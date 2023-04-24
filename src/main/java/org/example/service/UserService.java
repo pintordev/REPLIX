@@ -27,7 +27,7 @@ public class UserService {
     }
 
     public void update(String newPw, String newEmail){
-        userRepository.update(newPw,newEmail);
+        userRepository.update(newPw, newEmail);
     }
 
     public void printGenre(){
