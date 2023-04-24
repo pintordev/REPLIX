@@ -59,47 +59,47 @@ public class UserController {
     }
 
     public void login() {
-        System.out.println("-".repeat(24));
-        System.out.println("  아이디를 입력해주세요.");
-        System.out.printf("  >> ");
-        String loginId = Container.scanner.nextLine().trim();
-
-        User user = userService.findByLoginId(loginId);
-
-        if(user == null){
-            System.out.println("  존재하지 않는 아이디입니다."); // 아이디가 다르면
-            System.out.println("  REPLIX 앱 로그인에 실패하였습니다."); // 두 경우 모두 이 구문은 출력'
-            login();
-            return;
-        }
-
-        int loginlimit = 3;
+        int loginLimit = 3;
         int loginTry = 0 ;
 
-        while (true){
+        System.out.println("-".repeat(24));
 
+        while(true){
+            if(loginTry >= loginLimit){
+                System.out.println("  REPLIX 앱 로그인에 실패하였습니다.");
+                System.out.println("  로그인 3회 오류 비밀번호 확인 후 다음에 다시 시도해주세요.");
+                break;
+            }
+
+            System.out.println("  아이디를 입력해주세요.");
+            System.out.printf("  >> ");
+            String loginId = Container.scanner.nextLine().trim();
             System.out.println("  비밀번호를 입력해주세요.");
             System.out.printf("  >> ");
             String loginPw = Container.scanner.nextLine().trim();
 
-            if(loginTry == loginlimit){
-                System.out.println("  REPLIX 앱 로그인에 실패하였습니다.");
-                System.out.println("비밀번호 5회 오류 비밀번호 확인 후 다음에 다시 시도해주세요");
-                break;
-            }
-            if(user.getLoginPw().equals(loginPw)== false){
-                System.out.println("  일치하지 않은 비밀번호입니다."); // 비밀번호가 다르면
-                System.out.println("-".repeat(24));
+            User user = userService.findByLoginId(loginId);
+
+            if(user == null){
                 loginTry++;
+                System.out.println("  존재하지 않는 아이디입니다."); // 아이디가 다르면
                 continue;
-            }else if(user.getLoginPw().equals(loginPw)==true){
-                System.out.println("  REPLIX 앱 로그인에 성공하였습니다.");
             }
 
+            if(!user.getLoginPw().equals(loginPw)){
+                loginTry++;
+                System.out.println("  일치하지 않은 비밀번호입니다."); // 비밀번호가 다르면
+                System.out.println("-".repeat(24));
+                continue;
+            }
+
+            System.out.println("  REPLIX 앱 로그인에 성공하였습니다.");
             System.out.printf("  %s님 환영합니다.\n", user.getName());
             Container.session.login(user);
             break;
+
         }
+
     }
 
 
@@ -129,9 +129,8 @@ public class UserController {
                 continue;
             }
 
-            if(loginId.matches(".*[ㄱ-ㅎㅏ-ㅣ가-힣]+.*")){
+            if(loginId.replaceAll("[0-9a-zA-Z]","").length() != 0){
                 System.out.println("아이디는 영문 또는 숫자로만 입력해주세요.");
-
                 continue;
             }
 
@@ -152,8 +151,8 @@ public class UserController {
             if(loginPw.length() == 0){
                 System.out.println("로그인 비밀번호를 입력하지 않았습니다.");
                 continue;
-            }else if(loginPw.matches(".*[ㄱ-ㅎㅏ-ㅣ가-힣]+.*")){
-                System.out.println("로그인 비밀번호는 영문 또는 숫자로만 입력해주세요. ");
+            }else if(loginPw.replaceAll("[0-9a-zA-Z\s~!@#$%^&*()_+=]","").length() !=0){
+                System.out.println("로그인 비밀번호는 영문, 숫자, 특수문로만 입력해주세요. ");
                 continue;
             }else if(loginPw.length() < 8){
                 System.out.println("비밀번호는 8글자 이상으로 입력해주세요.");

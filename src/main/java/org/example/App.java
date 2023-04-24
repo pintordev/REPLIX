@@ -21,7 +21,7 @@ public class App {
 
             try {
                 // 연결 설정과 함께 관리자 계정으로 로그인
-                Container.connection = DriverManager.getConnection(url, "root", "");
+                Container.connection = DriverManager.getConnection(url, "root", "12345qwerty");
 
                 Container.systemController.menu(); // 입력 가능한 메뉴 출력. session의 상태에 따라 출력하는 메뉴가 다르다
 
