@@ -4,6 +4,7 @@ import org.example.Container;
 import org.example.dto.User;
 import org.example.repository.UserRepository;
 import org.example.service.UserService;
+import org.example.util.SecSql;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -119,6 +120,7 @@ public class UserController {
         String birthDate;
         String gender;
         String email;
+        String inputGenre;
 
         while (true){
             System.out.println("-".repeat(24));
@@ -228,7 +230,33 @@ public class UserController {
         }
 
 
+
+        while (true){
+            userService.printGenre();
+            System.out.println("선호하시는 장르를 입력해주세요.");
+            inputGenre = Container.scanner.nextLine().trim();
+
+            boolean isIngenre = userService.isIngenre(inputGenre);
+
+            if(inputGenre.length()==0){
+                System.out.println("선호장르를 입력하지 않았습니다.");
+                continue;
+            }
+
+            if(!isIngenre){
+                System.out.println("입력하신 장르는 선택할 수 없습니다.");
+                continue;
+            }
+
+
+            break;
+        }
+
+
+
+
         int id = userService.signUp(loginId, loginPw, name, birthDate, gender, email);
+        userService.genreSignup(id, userService.findGenreIdByName(inputGenre));
 
 
 

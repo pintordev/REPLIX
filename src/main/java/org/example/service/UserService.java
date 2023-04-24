@@ -10,7 +10,12 @@ public class UserService {
 
 
     public int signUp(String loginId, String loginPw, String name, String birthDate, String gender, String email) {
-        return userRepository.signUp(loginId, loginPw, name, birthDate, gender, email);
+       return userRepository.signUp(loginId, loginPw, name, birthDate, gender, email);
+
+    }
+
+    public int findGenreIdByName(String inputGenre){
+        return userRepository.findGenreIdByName(inputGenre);
     }
 
     public static boolean duplicateId(String loginId) {
@@ -27,6 +32,18 @@ public class UserService {
 
     public void update(String newPw, String newEmail){
         userRepository.update(newPw,newEmail);
+    }
+
+    public void printGenre(){
+        userRepository.printGenre();
+    }
+
+    public boolean isIngenre(String inputGenre){
+        return userRepository.isIngenre(inputGenre);
+    }
+
+    public void genreSignup(int userId, int genreId) {
+        userRepository.genreSignup(userId, genreId);
     }
 
 }

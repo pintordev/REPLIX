@@ -4,6 +4,7 @@ import org.example.Container;
 import org.example.dto.User;
 import org.example.util.DBUtil;
 import org.example.util.SecSql;
+import java.util.List;
 
 import java.util.Map;
 
@@ -18,6 +19,15 @@ public class UserRepository {
         return DBUtil.selectRowBooleanValue(Container.connection, sql);
     }
 
+    public void genreSignup(int userId, int genreId){
+        SecSql sql = new SecSql();
+        sql.append("INSERT INTO `favoriteGenre`");
+        sql.append("SET userId = ?", userId);
+        sql.append(", genreId = ?", genreId);
+
+        DBUtil.insert(Container.connection, sql);
+    }
+
     public int signUp(String loginId, String loginPw, String name, String birthDate, String gender, String email){
         SecSql sql = new SecSql();
         sql.append("INSERT INTO `user`");
@@ -30,9 +40,7 @@ public class UserRepository {
         sql.append(", gender = ?", gender);
         sql.append(", email = ?", email);
 
-        int id = DBUtil.insert(Container.connection, sql);
-
-        return id;
+         return DBUtil.insert(Container.connection, sql);
     }
 
     public User findByLoginId(String loginId){
@@ -49,6 +57,35 @@ public class UserRepository {
         }
         return new User(userMap);
     }
+
+    public List<Map<String,Object>> findGenreAll(){
+        SecSql sql = new SecSql();
+        sql.append("SELECT * FROM `genre`");
+
+        return DBUtil.selectRows(Container.connection, sql);
+    }
+
+    public void printGenre(){
+        for(Map<String, Object> genreMap : findGenreAll()){
+            System.out.println(genreMap.get("name"));
+        }
+    }
+
+    public boolean isIngenre(String inputGenre){
+        for(Map<String, Object> genreMap : findGenreAll()){
+            if(genreMap.get("name").equals(inputGenre))return true;
+        }
+        return false;
+    }
+
+    public int findGenreIdByName(String inputGenre) {
+        for(Map<String, Object> genreMap : findGenreAll()){
+            if(genreMap.get("name").equals(inputGenre)) return (int) genreMap.get("id");
+        }
+        return -1;
+    }
+
+
 
     public User findByLoginPw(String loginPw){
         SecSql sql = new SecSql();
