@@ -50,6 +50,33 @@ public class UserRepository {
         return new User(userMap);
     }
 
+    public User findByLoginPw(String loginPw){
+        SecSql sql = new SecSql();
+
+        sql.append("SELECT *");
+        sql.append("FROM `user`");
+        sql.append("WHERE loginPw = ?", loginPw);
+
+        Map<String, Object> userMap = DBUtil.selectRow(Container.connection, sql);
+
+        if(userMap.isEmpty()){
+            return null;
+        }
+        return new User(userMap);
+    }
+
+    public void update(String newPw, String newEmail){
+        SecSql sql = new SecSql();
+
+        sql.append("UPDATE `user`");
+        sql.append("SET updateDate = NOW()");
+        sql.append(",loginPw = ?", newPw);
+        sql.append(",email = ?", newEmail);
+        sql.append("WHERE `id` = ?", Container.session.sessionUser.getId());
+
+        DBUtil.update(Container.connection, sql);
+    }
+
 
 
 

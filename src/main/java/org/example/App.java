@@ -64,6 +64,9 @@ public class App {
             case "컨텐츠검색":
                 Container.contentController.search();
                 break;
+            case "개인정보수정":
+                Container.userController.modify();
+                break;
             default:
                 Container.systemController.commandError();
                 break;

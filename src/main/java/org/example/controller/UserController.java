@@ -2,6 +2,7 @@ package org.example.controller;
 
 import org.example.Container;
 import org.example.dto.User;
+import org.example.repository.UserRepository;
 import org.example.service.UserService;
 
 import java.util.ArrayList;
@@ -235,8 +236,64 @@ public class UserController {
     }
 
 
-    public void myPage() {
-        System.out.println("  기능 구현 예정입니다.");
+    public void modify() {
+       if(Container.session.getSessionState()!=1){
+           Container.systemController.commandError();
+           return;
+       }
+
+        System.out.println("비밀번호를 입력해주세요.");
+        String loginPw = Container.scanner.nextLine().trim();
+
+       User user = userService.findByLoginPw(loginPw);
+
+       if(user==null) {
+           System.out.println("비밀번호가 일치하지 않습니다.");
+       }
+
+       String newPw;
+       String newEmail;
+        while (true){
+            if(user.getLoginPw().equals(loginPw)){
+                System.out.println("개인정보 수정을 시작합니다.");
+                System.out.println("사용하실 새비밀번호를 입력해주세요.");
+                newPw = Container.scanner.nextLine().trim();
+
+                if(newPw.replaceAll("[0-9a-zA-Z\s~!@#$%^&*()_+=]","").length() !=0){
+                    System.out.println("로그인 비밀번호는 영문, 숫자, 특수문로만 입력해주세요. ");
+                    continue;
+                }
+                if(loginPw.length() < 8){
+                    System.out.println("비밀번호는 8글자 이상으로 입력해주세요.");
+                    continue;
+                }
+
+                System.out.println("사용하실 새 이메일주소를 입력해주세요.");
+                newEmail = Container.scanner.nextLine().trim();
+
+                if(newEmail.length()==0){
+                    System.out.println("사용하실 새 이메일 주소를 입력하지않았습니다.");
+                    continue;
+                }
+
+                Container.userService.update(newPw,newEmail);
+                System.out.println("개인정보변경이 완료되었습니다.");
+                break;
+            }
+
+        }
+
+
+
+
+
     }
+
+    public void myPage(){
+
+    }
+
+
+
 }
 

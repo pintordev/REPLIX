@@ -17,9 +17,16 @@ public class UserService {
         return userRepository.duplicateId(loginId);
     }
 
-    public User findByLoginId(String lginId){
-        return  userRepository.findByLoginId(lginId);
+    public User findByLoginId(String loginId){
+        return  userRepository.findByLoginId(loginId);
     }
 
+    public User findByLoginPw(String loginPw){
+        return userRepository.findByLoginPw(loginPw);
+    }
+
+    public void update(String newPw, String newEmail){
+        userRepository.update(newPw,newEmail);
+    }
 
 }
