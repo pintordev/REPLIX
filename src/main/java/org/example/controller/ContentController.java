@@ -108,7 +108,7 @@ public class ContentController {
         System.out.println("  번호 / 컨텐츠이름 / 장르 / 개요 / 릴리즈");
         System.out.println("-".repeat(50));
         for (Content content : contentList) {
-            System.out.printf("  %d / %s / %s / %s / %s\n", content.getId(), content.getName(), content.getGenre(), content.getPlot(), content.getReleaseDate());
+            System.out.printf("  %2d / %s / %s / %s / %s\n", content.getId(), content.getName(), content.getGenre(), content.getPlot(), content.getReleaseDate());
         }
 
         while (true) {
@@ -148,7 +148,7 @@ public class ContentController {
         System.out.printf("  개요: %s\n", content.getPlot());
         System.out.printf("  릴리즈: %s\n", content.getReleaseDate());
         System.out.printf("  OTT: %s\n", content.getOtt());
-        System.out.printf("  별점: %.1f / 리뷰: %d / 좋아요(%s): %d / 찜(%s): %d\n", content.getScore(), content.getReview(), isUserLike() ? "♥" : "♡", content.getLike(), isUserDibs() ? "★" : "☆", content.getDibs());
+        System.out.printf("  별점: %.2f / 리뷰: %d / 좋아요(%s): %d / 찜(%s): %d\n", content.getScore(), content.getReview(), isUserLike() ? "♥" : "♡", content.getLike(), isUserDibs() ? "★" : "☆", content.getDibs());
 
         Container.session.goToContent();
     }

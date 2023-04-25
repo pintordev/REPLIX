@@ -2,6 +2,10 @@ package org.example.controller;
 
 import org.example.Container;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Random;
+
 public class SystemController {
     public void menu() {
         int menuCount = 1;
@@ -9,7 +13,7 @@ public class SystemController {
         // 로그아웃 상태일 때
         if (Container.session.getSessionState() == 0) {
             System.out.println("https://replix.io/\n\n");
-            System.out.println("       [ REPLIX ]       ");
+            System.out.println("  [ REPLIX ]       ");
             System.out.printf("  %d. 로그인\n", menuCount++);
             System.out.printf("  %d. 회원가입\n", menuCount++);
             System.out.printf("  %d. 아이디찾기\n", menuCount++);
@@ -18,20 +22,22 @@ public class SystemController {
         // 로그인 상태에서 메인 메뉴 상태일 때
         if (Container.session.getSessionState() == 1) {
             System.out.println("https://replix.io/logined\n\n");
-            System.out.println("       [ REPLIX ]       ");
+            System.out.println("  [ REPLIX ]       ");
             System.out.printf("  %d. 로그아웃\n", menuCount++);
             System.out.printf("  %d. 마이페이지\n", menuCount++);
             System.out.printf("  %d. 컨텐츠검색\n", menuCount);
         }
         if (Container.session.getSessionState() == 2) {
             System.out.println("https://replix.io/mypage\n\n");
-            System.out.println("       [ REPLIX ]       ");
+            System.out.println("  [ MY PAGE ]       ");
             System.out.printf("  %d. 회원정보확인\n", menuCount++);
-            System.out.printf("  %d. 회원정보수정\n", menuCount);
+            System.out.printf("  %d. 회원정보수정\n", menuCount++);
+            System.out.printf("  %d. 내가남긴리뷰\n", menuCount++);
+            System.out.printf("  %d. 내가좋아요한컨텐츠\n", menuCount++);
+            System.out.printf("  %d. 내가찜한컨텐츠\n", menuCount);
         }
         // 로그인 상태에서 컨텐츠 게시판 접속 상태일 때
         if (Container.session.getSessionState() == 3) {
-//            adComment();
             System.out.printf("  %d. 리뷰확인하기\n", menuCount++);
             System.out.printf("  %d. 리뷰남기기\n", menuCount++);
             System.out.printf("  %d. 좋아요%s\n", menuCount++, Container.contentController.isUserLike() ? "취소하기" : "누르기");
@@ -39,7 +45,6 @@ public class SystemController {
         }
         // 로그인 상태에서 리뷰 게시판 접속 상태일 때
         if (Container.session.getSessionState() == 4) {
-//            adComment();
             System.out.printf("  %d. 리뷰평가하기\n", menuCount++);
             System.out.printf("  %d. 리뷰삭제하기\n", menuCount++);
             if(Container.session.getSessionReviewPage() > 1) System.out.printf("  %d. 이전페이지\n", menuCount++);
@@ -75,8 +80,11 @@ public class SystemController {
     }
 
     public void adComment() {
+        int adId = (int) (Math.random() * 3) + 1;
         System.out.println("=".repeat(50));
-        System.out.println("\n        LostArk 스케쥴은 LSS에서!\n");
+        if (adId == 1) System.out.println("\n        방방곡곡 낭만여행, 방랑!\n");
+        if (adId == 2) System.out.println("\n        화장품 요기있어 일루와!\n");
+        if (adId == 3) System.out.println("\n        LostArk 스케쥴은 LSS에서!\n");
         System.out.println("=".repeat(50));
     }
 

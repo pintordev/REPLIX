@@ -40,10 +40,11 @@ public class ReviewController {
         }
 
         System.out.println("https://replix.io/contents?id=%d&review?page=\n\n");
+        Container.systemController.adComment();
         System.out.println("  번호 / 글쓴이 / 내용 / 별점 / 재관람의사 / 작성시간");
         System.out.println("-".repeat(50));
         for (Review review : reviewList) {
-            System.out.printf("  %d / %s / %s / %.1f / %s / %s\n", review.getId(), review.getUserName(), review.getComment(), review.getScore(), review.isReplayFlag() ? "있음" : "없음", review.getRegDate());
+            System.out.printf("  %2d / %s / %s / %.1f / %s / %s\n", review.getId(), review.getUserName(), review.getComment(), review.getScore(), review.isReplayFlag() ? "있음" : "없음", review.getRegDate());
         }
 
         Container.session.goToReview();
@@ -53,7 +54,8 @@ public class ReviewController {
         String score;
         while (true) {
             System.out.println("-".repeat(30));
-            System.out.printf("별점을 입력해주세요\n>>");
+            System.out.println("  별점을 입력해주세요");
+            System.out.printf("  >> ");
             score = Container.scanner.nextLine().trim();
 
             Map<String, Double> map = new HashMap<>();
@@ -119,7 +121,7 @@ public class ReviewController {
         }
 
         System.out.println("번호 / 내용 / 별점 / 재관람의사");
-        System.out.println("=".repeat(50));
+        System.out.println("-".repeat(50));
         for (Review review : reviewList) {
             System.out.printf("%d / %s / %.1f / %s\n", review.getId(), review.getComment(), review.getScore(), review.isReplayFlag() ? "있음" : "없음");
         }

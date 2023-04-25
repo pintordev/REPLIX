@@ -104,6 +104,15 @@ public class App {
             case "회원정보수정":
                 Container.userController.modify();
                 break;
+            case "내가남긴리뷰":
+                Container.userController.userPostedReview();
+                break;
+            case "내가좋아요한컨텐츠":
+                Container.userController.userLikedContent();
+                break;
+            case "내가찜한컨텐츠":
+                Container.userController.userDibsContent();
+                break;
             default:
                 Container.systemController.commandError();
                 break;

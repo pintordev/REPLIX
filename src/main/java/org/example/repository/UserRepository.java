@@ -116,10 +116,11 @@ public class UserRepository {
 
     public void getUserInformation(){
         User user = Container.session.getSessionUser();
-        System.out.println("이름 : " + user.getName());
-        System.out.println("생년월일 : " + user.getBirthDate());
-        System.out.println("성별 : "+user.getGender());
-        System.out.println("이메일 : "+user.getEmail());
-        System.out.println("가입일 : "+user.getRegDate());
+        System.out.printf("\n       [%s님의 회원정보]       last updated at %s\n\n", user.getName(), user.getUpdateDate().substring(0, 11));
+        System.out.printf("  성명: %s\n", user.getName());
+        System.out.printf("  생년월일: %s\n", user.getBirthDate());
+        System.out.printf("  성별: %s\n", user.getGender());
+        System.out.printf("  이메일: %s\n", user.getEmail());
+        System.out.printf("  가입일: %s\n", user.getRegDate().substring(0, 11));
     }
 }
