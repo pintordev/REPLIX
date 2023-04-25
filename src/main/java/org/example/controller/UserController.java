@@ -81,7 +81,7 @@ public class UserController {
 
         while (true) {
             System.out.println("-".repeat(24));
-            System.out.println("  사용하실 로그인 아이디를 입력해주세요.");
+            System.out.println("  사용하실 로그인 아이디를 입력해주세요. (영문, 숫자)");
             System.out.printf("  >> ");
             loginId = Container.scanner.nextLine().trim();
 
@@ -106,7 +106,7 @@ public class UserController {
 
         while (true) {
             System.out.println("-".repeat(24));
-            System.out.println("  사용하실 로그인 비밀번호를 입력해주세요.");
+            System.out.println("  사용하실 로그인 비밀번호를 입력해주세요. (영문, 숫자, 특수문자, 8자리 이상)");
             System.out.printf("  >> ");
             loginPw = Container.scanner.nextLine().trim();
 
@@ -114,10 +114,10 @@ public class UserController {
                 System.out.println("  로그인 비밀번호를 입력하지 않았습니다.");
                 continue;
             } else if (loginPw.replaceAll("[0-9a-zA-Z\s~!@#$%^&*()_+=]", "").length() != 0) {
-                System.out.println("  로그인 비밀번호는 영문, 숫자, 특수문로만 입력해주세요.");
+                System.out.println("  로그인 비밀번호는 영문, 숫자, 특수문자로만 입력해주세요.");
                 continue;
             } else if (loginPw.length() < 8) {
-                System.out.println("  비밀번호는 8글자 이상으로 입력해주세요.");
+                System.out.println("  비밀번호는 8자리 이상으로 입력해주세요.");
                 continue;
             }
 
@@ -146,7 +146,7 @@ public class UserController {
         }
 
         while (true) {
-            System.out.println("  성명을 입력해주세요.");
+            System.out.println("  이름을 입력해주세요.");
             System.out.printf("  >> ");
             name = Container.scanner.nextLine().trim();
 
@@ -158,7 +158,7 @@ public class UserController {
         }
 
         while (true) {
-            System.out.println("  생년월일을 입력해주세요.");
+            System.out.println("  생년월일을 입력해주세요. (yyyy-mm-dd)");
             System.out.printf("  >> ");
             birthDate = Container.scanner.nextLine().trim();
 
@@ -170,7 +170,7 @@ public class UserController {
         }
 
         while (true) {
-            System.out.println("  성별을 입력해주세요.");
+            System.out.println("  성별을 입력해주세요. (남자/여자)");
             System.out.printf("  >> ");
             gender = Container.scanner.nextLine().trim();
 
@@ -248,7 +248,7 @@ public class UserController {
         while (true) {
             if (user.getLoginPw().equals(loginPw)) {
                 System.out.println("  개인정보 수정을 시작합니다.");
-                System.out.println("  사용하실 새로운 비밀번호를 입력해주세요.");
+                System.out.println("  사용하실 새로운 비밀번호를 입력해주세요. (영문, 숫자, 특수문자, 8자리 이상)");
                 System.out.printf("  >> ");
                 newPw = Container.scanner.nextLine().trim();
 
@@ -257,7 +257,7 @@ public class UserController {
                     continue;
                 }
                 if (loginPw.length() < 8) {
-                    System.out.println("  비밀번호는 8글자 이상으로 입력해주세요.");
+                    System.out.println("  비밀번호는 8자리 이상으로 입력해주세요.");
                     continue;
                 }
 
@@ -272,6 +272,8 @@ public class UserController {
 
                 userService.update(newPw, newEmail);
                 System.out.println("  개인정보변경이 완료되었습니다.");
+
+                Container.session.setSessionUser(userService.findByLoginId(Container.session.getSessionUser().getLoginId()));
                 break;
             }
 

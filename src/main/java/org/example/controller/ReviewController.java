@@ -54,9 +54,10 @@ public class ReviewController {
         String score;
         while (true) {
             System.out.println("-".repeat(30));
-            System.out.println("  별점을 입력해주세요");
+            System.out.println("  별점을 입력해주세요. (0 ~ 5; 0.5점 단위)");
             System.out.printf("  >> ");
             score = Container.scanner.nextLine().trim();
+            score = Double.parseDouble(score) + "";
 
             Map<String, Double> map = new HashMap<>();
 
@@ -65,27 +66,27 @@ public class ReviewController {
             }
 
             if (!map.containsKey(score)) {
-                System.out.println("0.5점 단위로 입력해주세요");
+                System.out.println("  0.5점 단위로 입력해주세요.");
                 continue;
             }
 
             break;
         }
 
-        System.out.println("리뷰에 대한 솔직한 평가를 남겨주세요");
+        System.out.println("  리뷰에 대한 솔직한 평가를 남겨주세요.");
+        System.out.printf("  >> ");
         String comment = Container.scanner.nextLine();
         System.out.println(comment);
-        System.out.println("재관람 의사\nY / N");
+        System.out.println("  재관람 의사를 남겨주세요. (Y/N)");
+        System.out.printf("  >> ");
         String replayFlagAnswer = Container.scanner.nextLine().trim().toLowerCase();
         System.out.println(replayFlagAnswer);
         int replayFlag = 0;
         if (replayFlagAnswer.equals("y")) {
             replayFlag = 1;
-            System.out.println("=재관람 의사가 있습니다.=\n작성하신 리뷰가 등록되었습니다.\n소중한 리뷰 감사합니다");
-        } else {
-            System.out.println("=재관람 의사가 없습니다.=\n작성하신 리뷰가 등록되었습니다.\n소중한 리뷰 감사합니다");
         }
-
+        System.out.println("  작성하신 리뷰가 등록되었습니다.");
+        System.out.println("  소중한 리뷰 감사합니다.");
 
         SecSql sql = new SecSql();
 
@@ -96,7 +97,7 @@ public class ReviewController {
         sql.append(", regDate = NOW()");
         sql.append(", updateDate = NOW()");
         sql.append(", `userId` = ?", Container.session.getSessionUser().getId());
-        sql.append(", `contentId` = ?", 1);
+        sql.append(", `contentId` = ?", Container.session.getSessionContent().getId());
 
         DBUtil.insert(Container.connection, sql);
     }
@@ -120,13 +121,15 @@ public class ReviewController {
             reviewList.add(new Review(reviewMap));
         }
 
-        System.out.println("번호 / 내용 / 별점 / 재관람의사");
+        System.out.println("  번호 / 내용 / 별점 / 재관람의사 / 작성시간");
         System.out.println("-".repeat(50));
         for (Review review : reviewList) {
-            System.out.printf("%d / %s / %.1f / %s\n", review.getId(), review.getComment(), review.getScore(), review.isReplayFlag() ? "있음" : "없음");
+            System.out.printf("  %2d / %s / %.1f / %s / %s\n", review.getId(), review.getComment(), review.getScore(), review.isReplayFlag() ? "있음" : "없음", review.getRegDate());
         }
 
-        System.out.println("삭제할 리뷰 번호를 입력해주세요");
+        System.out.println("-".repeat(50));
+        System.out.println("  삭제할 리뷰 번호를 입력해주세요");
+        System.out.printf("  >> ");
 
         int i = Container.scanner.nextInt();
         Container.scanner.nextLine();
@@ -140,7 +143,8 @@ public class ReviewController {
         }
 
         if (!isInReviewList) {
-            System.out.println("삭제 가능한 리뷰 번호가 아닙니다.");
+            System.out.println("  삭제 가능한 리뷰 번호가 아닙니다.");
+            pagedList();
             return;
         }
 
@@ -150,7 +154,7 @@ public class ReviewController {
 
         DBUtil.delete(Container.connection, sql);
 
-        System.out.printf("%d번째 리뷰가 삭제되었습니다.\n", i);
+        System.out.printf("  %s님이 남기신 %d번째 리뷰가 삭제되었습니다.\n", Container.session.getSessionUser().getName(), i);
         pagedList();
     }
 

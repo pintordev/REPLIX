@@ -303,14 +303,206 @@ INSERT INTO `contentGenre`
 SET `contentId` = 5,
 `genreId` = 6;
 
-
 SELECT * FROM `contentGenre`;
 
+INSERT INTO `likeContent`
+SET `userId` = 1,
+`contentId` = 1;
+
+INSERT INTO `likeContent`
+SET `userId` = 2,
+`contentId` = 1;
+
+INSERT INTO `likeContent`
+SET `userId` = 3,
+`contentId` = 1;
+
+SELECT * FROM `likeContent`;
+
+INSERT INTO `ott`
+SET `name` = '넷플릭스';
+
+INSERT INTO `ott`
+SET `name` = '디즈니플러스';
+
+INSERT INTO `ott`
+SET `name` = '티빙';
+
+INSERT INTO `ott`
+SET `name` = '웨이브';
+
+INSERT INTO `ott`
+SET `name` = '왓챠';
+
+INSERT INTO `ott`
+SET `name` = '쿠팡플레이';
+
+SELECT * FROM `ott`;
+
+INSERT INTO `actor`
+SET `name` = '하라 나노카';
+
+INSERT INTO `actor`
+SET `name` = '마츠무라 호쿠토';
+
+INSERT INTO `actor`
+SET `name` = '크리스 프랫';
+
+INSERT INTO `actor`
+SET `name` = '조 샐다나';
+
+INSERT INTO `actor`
+SET `name` = '키이라 나이틀리';
+
+INSERT INTO `actor`
+SET `name` = '마크 러팔로';
+
+INSERT INTO `actor`
+SET `name` = '매튜 매커너히';
+
+INSERT INTO `actor`
+SET `name` = '앤 해서웨이';
+
+INSERT INTO `actor`
+SET `name` = '류승룡';
+
+INSERT INTO `actor`
+SET `name` = '이하늬';
+
+SELECT * FROM `actor`;
+
+SELECT * FROM `content`;
+
+INSERT INTO `cast`
+SET `contentId` = 1,
+`actorId` = 1;
+
+INSERT INTO `cast`
+SET `contentId` = 1,
+`actorId` = 2;
+
+INSERT INTO `cast`
+SET `contentId` = 2,
+`actorId` = 3;
+
+INSERT INTO `cast`
+SET `contentId` = 2,
+`actorId` = 4;
+
+INSERT INTO `cast`
+SET `contentId` = 3,
+`actorId` = 5;
+
+INSERT INTO `cast`
+SET `contentId` = 3,
+`actorId` = 6;
+
+INSERT INTO `cast`
+SET `contentId` = 4,
+`actorId` = 7;
+
+INSERT INTO `cast`
+SET `contentId` = 4,
+`actorId` = 8;
+
+INSERT INTO `cast`
+SET `contentId` = 5,
+`actorId` = 9;
+
+INSERT INTO `cast`
+SET `contentId` = 5,
+`actorId` = 10;
+
 SELECT A.`id`, A.`name`, A.`releaseDate`, A.`productionCompany`, A.`director`, A.`plot`,
-GROUP_CONCAT(DISTINCT C.`name` ORDER BY C.`id` DESC SEPARATOR ', ') AS 'genre'
+GROUP_CONCAT(DISTINCT C.`name` ORDER BY C.`id` DESC SEPARATOR ', ') AS 'cast',
+GROUP_CONCAT(DISTINCT E.`name` ORDER BY E.`id` DESC SEPARATOR ', ') AS 'genre',
+IFNULL(GROUP_CONCAT(DISTINCT G.`name` ORDER BY G.`id` DESC SEPARATOR ', '), '없음') AS 'ott'
 FROM `content` AS A
-INNER JOIN contentGenre AS B
+INNER JOIN `cast` as B
 ON A.`id` = B.`contentId`
-INNER JOIN `genre` AS C
-ON B.`genreId` = C.`id`
+INNER JOIN `actor` as C
+ON B.`actorId` = C.`id`
+INNER JOIN `contentGenre` AS D
+ON A.`id` = D.`contentId`
+INNER JOIN `genre` AS E
+ON D.`genreId` = E.`id`
+LEFT JOIN `serviceOtt` as F
+ON A.`id` = F.`contentId`
+LEFT JOIN ott as G
+ON F.`ottId` = G.`id`
+WHERE A.`name` Like '%가디%'
 GROUP BY A.`id`;
+
+SELECT COUNT(B.`id`) as 'like'
+FROM `content` AS A
+LEFT JOIN `likeContent` as B
+ON A.`id` = B.`contentId`
+WHERE A.`name` Like '%가%'
+GROUP BY A.`id`;
+
+
+SELECT COUNT(C.`id`) as 'dibs'
+FROM `content` AS A
+LEFT JOIN `dibsContent` as C
+ON A.`id` = C.`contentId`
+WHERE A.`name` Like '%가디%'
+GROUP BY A.`id`;
+
+SELECT COUNT(D.`id`) as 'review'
+FROM `content` AS A
+LEFT JOIN `review` as D
+ON A.`id` = D.`contentId`
+WHERE A.`name` Like '%가%'
+GROUP BY A.`id`;
+
+SELECT * from likeContent;
+
+SELECT COUNT(*)
+FROM `likeContent` as A
+WHERE A.`userId` = 1 && A.`contentId` = 2;
+
+SELECT COUNT(*)
+FROM `dibsContent` as A
+INNER JOIN `user` as B
+ON A.`userId` = B.`id`
+INNER JOIN `content` as C
+ON A.`contentId` = C.`id`
+WHERE B.`id` = 1 & C.`id` = 2;
+
+DELETE FROM `likeContent`
+WHERE `userId` = 1 & `contentId` = 1;
+
+SELECT * FROM `likeContent`;
+SELECT * FROM `dibsContent`;
+
+SELECT A.`id`, A.`comment`, A.`score`, A.`replayFlag`, A.regDate, A.updateDate, B.`name` AS 'userName', C.`name` AS 'contentName'
+FROM `review` as A
+INNER JOIN `user` as B
+ON A.`userId` = B.`id`
+INNER JOIN `content` as C
+ON A.`contentId` = C.`id`
+WHERE A.`userId` = 1 && A.`contentId` = 1
+ORDER BY regDate DESC
+LIMIT 1, 5;
+
+SELECT IFNULL(AVG(B.`score`), 0) AS 'score'
+FROM `content` AS A
+LEFT JOIN `review` AS B
+ON A.`id` = B.`contentId`
+WHERE A.`name` LIKE CONCAT('%', '스', '%')
+GROUP BY A.`id`
+
+desc `review`;
+desc `likeContent`;
+desc `content`;
+
+SELECT * FROM `likeContent`;
+
+SELECT B.`name`
+FROM `likeContent` AS A
+INNER JOIN `content` AS B
+ON A.`contentId` = B.`id`
+WHERE A.`userId` = 1;
+
+SELECT * FROM `user`;
+SELECT * FROM content c
