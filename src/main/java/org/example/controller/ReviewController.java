@@ -76,11 +76,9 @@ public class ReviewController {
         System.out.println("  리뷰에 대한 솔직한 평가를 남겨주세요.");
         System.out.printf("  >> ");
         String comment = Container.scanner.nextLine();
-        System.out.println(comment);
         System.out.println("  재관람 의사를 남겨주세요. (Y/N)");
         System.out.printf("  >> ");
         String replayFlagAnswer = Container.scanner.nextLine().trim().toLowerCase();
-        System.out.println(replayFlagAnswer);
         int replayFlag = 0;
         if (replayFlagAnswer.equals("y")) {
             replayFlag = 1;

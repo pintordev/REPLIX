@@ -490,7 +490,7 @@ FROM `content` AS A
 LEFT JOIN `review` AS B
 ON A.`id` = B.`contentId`
 WHERE A.`name` LIKE CONCAT('%', '스', '%')
-GROUP BY A.`id`
+GROUP BY A.`id`;
 
 desc `review`;
 desc `likeContent`;
@@ -503,6 +503,3 @@ FROM `likeContent` AS A
 INNER JOIN `content` AS B
 ON A.`contentId` = B.`id`
 WHERE A.`userId` = 1;
-
-SELECT * FROM `user`;
-SELECT * FROM content c
