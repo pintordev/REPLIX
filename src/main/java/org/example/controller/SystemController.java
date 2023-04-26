@@ -40,13 +40,13 @@ public class SystemController {
         if (Container.session.getSessionState() == 3) {
             System.out.printf("  %d. 리뷰확인하기\n", menuCount++);
             System.out.printf("  %d. 리뷰남기기\n", menuCount++);
+            System.out.printf("  %d. 리뷰삭제하기\n", menuCount++);
             System.out.printf("  %d. 좋아요%s\n", menuCount++, Container.contentController.isUserLike() ? "취소하기" : "누르기");
             System.out.printf("  %d. 찜%s하기\n", menuCount++, Container.contentController.isUserDibs() ? "취소" : "");
         }
         // 로그인 상태에서 리뷰 게시판 접속 상태일 때
         if (Container.session.getSessionState() == 4) {
 //            System.out.printf("  %d. 리뷰평가하기\n", menuCount++);
-            System.out.printf("  %d. 리뷰삭제하기\n", menuCount++);
             if(Container.session.getSessionReviewPage() > 1) System.out.printf("  %d. 이전페이지\n", menuCount++);
             if(Container.reviewController.hasNextPage()) System.out.printf("  %d. 다음페이지\n", menuCount);
         }

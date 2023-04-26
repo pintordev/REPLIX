@@ -20,6 +20,7 @@ public class UserController {
         userService = new UserService();
     }
 
+    // 로그인 코드
     public void login() {
         int loginLimit = 3;
         int loginTry = 0;
@@ -64,11 +65,13 @@ public class UserController {
         }
     }
 
+    // 로그 아웃 코드
     public void logout() {
         System.out.println("  REPLIX 앱에서 로그아웃합니다.");
         Container.session.logout();
     }
 
+    // 회원 가입 코드
     public void signUp() {
         String loginId;
         String loginPw;
@@ -315,6 +318,7 @@ public class UserController {
         userService.genreSignup(id, userService.findGenreIdByName(favoriteGenre));
     }
 
+    // 회원 정보 확인 코드
     public void getUserInformation() {
         if (Container.session.getSessionState() != 2) {
             Container.systemController.commandError();
@@ -323,56 +327,191 @@ public class UserController {
         userService.getUserInformation();
     }
 
+    // 회원 정보 수정 코드
     public void modify() {
         if (Container.session.getSessionState() != 2) {
             Container.systemController.commandError();
             return;
         }
 
-        System.out.println("  비밀번호를 입력해주세요.");
-        System.out.printf("  >> ");
-        String loginPw = Container.scanner.nextLine().trim();
+        User user;
 
-        User user = userService.findByLoginPw(loginPw);
+        while (true) {
+            System.out.println("  로그인 비밀번호를 입력해주세요. [입력 종료: \"q;\"]");
+            System.out.printf("  >> ");
+            String loginPw = Container.scanner.nextLine().trim();
 
-        if (user == null) {
-            System.out.println("  비밀번호가 일치하지 않습니다.");
+            if (Container.systemController.isQuit(loginPw)) return;
+
+            user = userService.findByLoginPw(loginPw);
+
+            if (user == null) {
+                System.out.println("  로그인 비밀번호가 일치하지 않습니다.\n");
+                continue;
+            }
+
+            System.out.println("");
+
+            break;
         }
 
-        String newPw;
-        String newEmail;
+        String modifyLoginPw = "";
+        String modifyLoginPwConfrim;
+        String modifyEmail = "";
+
+        System.out.println("  회원정보 수정을 시작합니다.\n");
+
+        String answer;
+        boolean isLoginPwModified = false;
+
         while (true) {
-            if (user.getLoginPw().equals(loginPw)) {
-                System.out.println("  개인정보 수정을 시작합니다.");
-                System.out.println("  사용하실 새로운 비밀번호를 입력해주세요. (영문, 숫자, 특수문자, 8자리 이상)");
+
+            while (true) {
+                System.out.println("  로그인 비밀번호를 수정하시겠습니까? (Y/N) [입력 종료: \"q;\"]");
                 System.out.printf("  >> ");
-                newPw = Container.scanner.nextLine().trim();
+                answer = Container.scanner.nextLine().trim().toLowerCase();
 
-                if (newPw.replaceAll("[0-9a-zA-Z\s~!@#$%^&*()_+=]", "").length() != 0) {
-                    System.out.println("  로그인 비밀번호는 영문, 숫자, 특수문자로만 입력해주세요.");
-                    continue;
-                }
-                if (loginPw.length() < 8) {
-                    System.out.println("  비밀번호는 8자리 이상으로 입력해주세요.");
-                    continue;
+                if (Container.systemController.isQuit(answer)) return;
+
+                if (!answer.equals("y") && !answer.equals("n")) {
+                    System.out.println("  Y 또는 N 으로 입력해주세요.\n");
                 }
 
-                System.out.println("  사용하실 새 이메일주소를 입력해주세요.");
-                System.out.printf("  >> ");
-                newEmail = Container.scanner.nextLine().trim();
-
-                if (newEmail.length() == 0) {
-                    System.out.println("  사용하실 새 이메일 주소를 입력하지 않았습니다.");
-                    continue;
-                }
-
-                userService.update(newPw, newEmail);
-                System.out.println("  개인정보변경이 완료되었습니다.");
-
-                Container.session.setSessionUser(userService.findByLoginId(Container.session.getSessionUser().getLoginId()));
                 break;
             }
 
+            if (answer.equals("n")) break;
+
+            System.out.println("  사용하실 새로운 로그인 비밀번호를 입력해주세요. (영문, 숫자, 특수문자(!, @, #, $, %, ^, &, *), 8자리 이상) [입력 종료: \"q;\"]");
+            System.out.printf("  >> ");
+            modifyLoginPw = Container.scanner.nextLine().trim();
+
+            if (Container.systemController.isQuit(modifyLoginPw)) return;
+
+            if (modifyLoginPw.length() == 0) {
+                System.out.println("  로그인 비밀번호를 입력하지 않았습니다.\n");
+                continue;
+            }
+
+            if (modifyLoginPw.length() < 8) {
+                System.out.println("  로그인 비밀번호는 8자리 이상으로 입력해주세요.\n");
+                continue;
+            }
+
+            if (modifyLoginPw.replaceAll("[a-zA-z0-9$!$@#$$%^&*]", "").length() != 0) {
+                System.out.println("  로그인 비밀번호는 영문, 숫자, 특수문자(!, @, #, $, %, ^, &, *)로만 입력해주세요.\n");
+                continue;
+            }
+
+            if (modifyLoginPw.replaceAll("[0-9]", "").equals(modifyLoginPw)) {
+                System.out.println("  로그인 비밀번호에 숫자는 반드시 포함되어야 합니다.\n");
+                continue;
+            }
+
+            if (modifyLoginPw.replaceAll("[a-zA-Z]", "").equals(modifyLoginPw)) {
+                System.out.println("  로그인 비밀번호에 영문은 반드시 포함되어야 합니다.\n");
+                continue;
+            }
+
+            if (modifyLoginPw.replaceAll("[$!$@#$$%^&*]", "").equals(modifyLoginPw)) {
+                System.out.println("  로그인 비밀번호에 특수문자(!, @, #, $, %, ^, &, *)는 반드시 포함되어야 합니다.\n");
+                continue;
+            }
+
+            System.out.println("");
+
+            boolean isSameLoginPw = true;
+
+            while (true) {
+                System.out.println("  입력하신 로그인 비밀번호를 다시 입력해주세요. [입력 종료: \"q;\"]");
+                System.out.printf("  >> ");
+                modifyLoginPwConfrim = Container.scanner.nextLine().trim();
+
+                if (Container.systemController.isQuit(modifyLoginPwConfrim)) return;
+
+                if (modifyLoginPwConfrim.length() == 0) {
+                    System.out.println("  로그인 비밀번호를 입력하지 않았습니다.\n");
+                    continue;
+                }
+
+                if (!modifyLoginPw.equals(modifyLoginPwConfrim)) {
+                    System.out.println("  입력하신 로그인 비밀번호가 일치하지 않습니다.\n");
+                    isSameLoginPw = false;
+                    continue;
+                }
+
+                System.out.println("");
+
+                break;
+            }
+
+            if (isSameLoginPw) {
+                isLoginPwModified = true;
+                break;
+            }
+        }
+
+        String certificationCode = "";
+        String inputCode;
+        while (true) {
+
+            while (true) {
+                System.out.println("  이메일을 수정하시겠습니까? (Y/N) [입력 종료: \"q;\"]");
+                System.out.printf("  >> ");
+                answer = Container.scanner.nextLine().trim().toLowerCase();
+
+                if (Container.systemController.isQuit(answer)) return;
+
+                if (!answer.equals("y") && !answer.equals("n")) {
+                    System.out.println("  Y 또는 N 으로 입력해주세요.\n");
+                }
+
+                break;
+            }
+
+            if (answer.equals("n")) break;
+
+            System.out.println("  새로운 이메일 주소를 입력해주세요. [입력 종료: \"q;\"]");
+            System.out.printf("  >> ");
+            modifyEmail = Container.scanner.nextLine().trim();
+
+            if (Container.systemController.isQuit(modifyEmail)) return;
+
+            if (modifyEmail.length() == 0) {
+                System.out.println("  이메일 주소를 입력하지 않았습니다.\n");
+                continue;
+            }
+
+            if (!Pattern.matches("^\\w+\\.\\w+@\\w+\\.\\w+(\\.\\w+)?$", modifyEmail) && !Pattern.matches("^\\w+@\\w+\\.\\w+(\\.\\w+)?$", modifyEmail)) {
+                System.out.println("  올바른 이메일 양식으로 입력해주세요.\n");
+                continue;
+            }
+
+            certificationCode = new MailSender().emailCertification(modifyEmail, "이메일 수정");
+
+            System.out.println("\n  입력하신 이메일로 인증코드를 발송했습니다.");
+            System.out.println("  발송된 인증코드를 입력해주세요.");
+            System.out.printf("  >> ");
+            inputCode = Container.scanner.nextLine().trim();
+
+            if (!inputCode.equals(certificationCode)) {
+                System.out.println("  인증코드가 일치하지 않습니다. 다시 메일을 입력해주세요.\n");
+                continue;
+            }
+
+            System.out.println("  인증코드가 일치합니다. 이메일 인증이 완료되었습니다.\n");
+
+            break;
+        }
+
+        userService.update(modifyLoginPw, modifyEmail);
+        Container.session.setSessionUser(userService.findByLoginId(Container.session.getSessionUser().getLoginId()));
+
+        System.out.println("  개인정보변경이 완료되었습니다.");
+
+        if(isLoginPwModified) {
+            System.out.println("  로그인 비밀번호가 변경되어 로그아웃됩니다. 다시 로그인 해주세요.");
+            Container.session.logout();
         }
     }
 
