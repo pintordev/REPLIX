@@ -2,6 +2,7 @@ package org.example.controller;
 
 import org.example.Container;
 import org.example.dto.Review;
+import org.example.service.ReviewService;
 import org.example.util.DBUtil;
 import org.example.util.SecSql;
 
@@ -11,6 +12,13 @@ import java.util.List;
 import java.util.Map;
 
 public class ReviewController {
+
+    private ReviewService reviewService;
+
+    public ReviewController() {
+        this.reviewService = new ReviewService();
+    }
+
     public void pagedList() {
         if (Container.session.getSessionState() != 3 && Container.session.getSessionState() != 4) return;
 
@@ -24,13 +32,13 @@ public class ReviewController {
         sql.append("ON A.`contentId` = C.`id`");
         sql.append("WHERE A.`contentId` = ?", Container.session.getSessionContent().getId());
         sql.append("ORDER BY regDate DESC");
-        sql.append("LIMIT ?, ?", (Container.session.getSessionReviewPage() - 1)*Container.session.getSessionReviewItemsPerPage(), Container.session.getSessionReviewItemsPerPage());
+        sql.append("LIMIT ?, ?", (Container.session.getSessionReviewPage() - 1) * Container.session.getSessionReviewItemsPerPage(), Container.session.getSessionReviewItemsPerPage());
 
         List<Map<String, Object>> reviewMapList = DBUtil.selectRows(Container.connection, sql);
 
         if (reviewMapList.isEmpty()) {
-            System.out.printf("  \"%s\" 게시판에 남겨진 리뷰가 없습니다.\n", Container.session.getSessionContent().getName());
-            System.out.println("  리뷰를 남겨보세요.");
+            System.out.printf("\"%s\" 게시판에 남겨진 리뷰가 없습니다.\n", Container.session.getSessionContent().getName());
+            System.out.println("리뷰를 남겨보세요.");
             return;
         }
 
@@ -41,22 +49,35 @@ public class ReviewController {
 
         System.out.println("https://replix.io/contents?id=%d&review?page=\n\n");
         Container.systemController.adComment();
-        System.out.println("  번호 / 글쓴이 / 내용 / 별점 / 재관람의사 / 작성시간");
+        System.out.println("번호 / 글쓴이 / 내용 / 별점 / 재관람의사 / 작성시간");
         System.out.println("-".repeat(50));
         for (Review review : reviewList) {
-            System.out.printf("  %2d / %s / %s / %.1f / %s / %s\n", review.getId(), review.getUserName(), review.getComment(), review.getScore(), review.isReplayFlag() ? "있음" : "없음", review.getRegDate());
+            System.out.printf("%2d / %s / %s / %.1f / %s / %s\n", review.getId(), review.getUserName(), review.getComment(), review.getScore(), review.isReplayFlag() ? "있음" : "없음", review.getRegDate());
         }
 
         Container.session.goToReview();
     }
 
     public void post() {
+
         String score;
+        String comment;
+        String replayAnswer;
+        int replayFlag = 0;
+
         while (true) {
             System.out.println("-".repeat(30));
-            System.out.println("  별점을 입력해주세요. (0 ~ 5; 0.5점 단위)");
-            System.out.printf("  >> ");
+            System.out.printf("\"%s\" 에 대한 별점을 입력해주세요. (0 ~ 5; 0.5점 단위) [입력 종료: \"q;\"]\n", Container.session.getSessionContent().getName());
+            System.out.printf(">> ");
             score = Container.scanner.nextLine().trim();
+
+            if (Container.systemController.isQuit(score)) return;
+
+            if (score.length() == 0) {
+                System.out.println("별점을 입력하지 않았습니다.\n");
+                continue;
+            }
+
             score = Double.parseDouble(score) + "";
 
             Map<String, Double> map = new HashMap<>();
@@ -66,94 +87,96 @@ public class ReviewController {
             }
 
             if (!map.containsKey(score)) {
-                System.out.println("  0.5점 단위로 입력해주세요.");
+                System.out.println("0.5점 단위로 입력해주세요.\n");
                 continue;
             }
+
+            System.out.println("");
 
             break;
         }
 
-        System.out.println("  리뷰에 대한 솔직한 평가를 남겨주세요.");
-        System.out.printf("  >> ");
-        String comment = Container.scanner.nextLine();
-        System.out.println("  재관람 의사를 남겨주세요. (Y/N)");
-        System.out.printf("  >> ");
-        String replayFlagAnswer = Container.scanner.nextLine().trim().toLowerCase();
-        int replayFlag = 0;
-        if (replayFlagAnswer.equals("y")) {
-            replayFlag = 1;
+        while (true) {
+            System.out.printf("\"%s\" 에 대한 솔직한 리뷰를 남겨주세요. [입력 종료: \"q;\"]\n", Container.session.getSessionContent().getName());
+            System.out.printf(">> ");
+            comment = Container.scanner.nextLine().trim();
+
+            if (Container.systemController.isQuit(comment)) return;
+
+            if (comment.length() == 0) {
+                System.out.println("리뷰를 입력하지 않았습니다.\n");
+                continue;
+            }
+
+            System.out.println("");
+
+            break;
         }
-        System.out.println("  작성하신 리뷰가 등록되었습니다.");
-        System.out.println("  소중한 리뷰 감사합니다.");
 
-        SecSql sql = new SecSql();
+        while (true) {
+            System.out.println("재관람 의사를 남겨주세요. (Y/N) [입력 종료: \"q;\"]");
+            System.out.printf(">> ");
+            replayAnswer = Container.scanner.nextLine().trim().toLowerCase();
 
-        sql.append("INSERT INTO `review`");
-        sql.append("SET `comment` = ?", comment);
-        sql.append(", `score` = ?", score);
-        sql.append(", `replayFlag` = ?", replayFlag);
-        sql.append(", regDate = NOW()");
-        sql.append(", updateDate = NOW()");
-        sql.append(", `userId` = ?", Container.session.getSessionUser().getId());
-        sql.append(", `contentId` = ?", Container.session.getSessionContent().getId());
+            if (Container.systemController.isQuit(replayAnswer)) return;
 
-        DBUtil.insert(Container.connection, sql);
+            if (!replayAnswer.equals("y") && !replayAnswer.equals("n")) {
+                System.out.println("Y 또는 N 으로 입력해주세요.\n");
+                continue;
+            }
+
+            if (replayAnswer.equals("y")) replayFlag = 1;
+
+            System.out.println("");
+
+            break;
+        }
+
+        System.out.println("작성하신 리뷰가 등록되었습니다.");
+        System.out.println("소중한 리뷰 감사합니다.");
+
+        this.reviewService.post(comment, score, replayFlag);
+
+        Container.contentController.detail();
     }
 
     public void delete() {
-        // 유저아이디와 컨텐츠아이디만 가지고 삭제를 하면 그 유저가 컨텐츠에 쓴 모든 리뷰가 사라진다.
-        // 그래서 리뷰 하나에 아이디를 하나씩 부여해서 하나만 지울수 있게 한다.
-        // 삭제를 한다고 하면 그 유저가 컨텐츠에 쓴 모든 리뷰를 불러온다.
-        // 그리고 내가 실제하고싶은 리뷰가 뭐냐 물어본다.
-        // 입력을 제대로 해주면 그 리뷰를 삭제한다.
+        List<Review> reviewList = this.reviewService.reviewByUserIdContentId();
 
-        SecSql sql = new SecSql();
-
-        sql.append("SELECT *");
-        sql.append("FROM `review`");
-        sql.append("WHERE userId = ? && contentId = ?", Container.session.getSessionUser().getId(), Container.session.getSessionContent().getId());
-
-        List<Map<String, Object>> reviewMapList = DBUtil.selectRows(Container.connection, sql);
-        List<Review> reviewList = new ArrayList<>();
-        for (Map<String, Object> reviewMap : reviewMapList) {
-            reviewList.add(new Review(reviewMap));
-        }
-
-        System.out.println("  번호 / 내용 / 별점 / 재관람의사 / 작성시간");
+        System.out.println("https://replix.io/contents?id=%d&review?page=\n\n");
+        Container.systemController.adComment();
+        System.out.printf("\n\"%s\"님이 남기신 리뷰...\n\n", Container.session.getSessionUser().getName());
+        System.out.println("번호 / 내용 / 별점 / 재관람의사 / 작성시간");
         System.out.println("-".repeat(50));
         for (Review review : reviewList) {
-            System.out.printf("  %2d / %s / %.1f / %s / %s\n", review.getId(), review.getComment(), review.getScore(), review.isReplayFlag() ? "있음" : "없음", review.getRegDate());
+            System.out.printf("%2d / %s / %.1f / %s / %s\n", review.getId(), review.getComment(), review.getScore(), review.isReplayFlag() ? "있음" : "없음", review.getRegDate());
         }
 
         System.out.println("-".repeat(50));
-        System.out.println("  삭제할 리뷰 번호를 입력해주세요");
-        System.out.printf("  >> ");
+        System.out.println("삭제할 리뷰 번호를 입력해주세요");
+        System.out.printf(">> ");
 
-        int i = Container.scanner.nextInt();
+        int deleteId = Container.scanner.nextInt();
         Container.scanner.nextLine();
 
         boolean isInReviewList = false;
 
         for (Review review : reviewList) {
-            if (review.getId() == i) {
+            if (review.getId() == deleteId) {
                 isInReviewList = true;
             }
         }
 
         if (!isInReviewList) {
-            System.out.println("  삭제 가능한 리뷰 번호가 아닙니다.");
+            System.out.println("삭제 가능한 리뷰 번호가 아닙니다.");
             pagedList();
             return;
         }
 
-        sql = new SecSql();
-        sql.append("DELETE FROM `review`");
-        sql.append("WHERE `id` = ?", i);
+        this.reviewService.deleteById(deleteId);
 
-        DBUtil.delete(Container.connection, sql);
-
-        System.out.printf("  %s님이 남기신 %d번째 리뷰가 삭제되었습니다.\n", Container.session.getSessionUser().getName(), i);
-        pagedList();
+        System.out.printf("%s님이 남기신 %d번째 리뷰가 삭제되었습니다.\n", Container.session.getSessionUser().getName(), deleteId);
+        Container.contentController.detail();
     }
 
     //리뷰 수정
@@ -281,13 +304,13 @@ public class ReviewController {
 //    }
 
     public void prevPage() {
-        if(Container.session.getSessionReviewPage() <= 1) return;
+        if (Container.session.getSessionReviewPage() <= 1) return;
         Container.session.setSessionReviewPage(Container.session.getSessionReviewPage() - 1);
         pagedList();
     }
 
     public void nextPage() {
-        if(!hasNextPage()) return;
+        if (!hasNextPage()) return;
         Container.session.setSessionReviewPage(Container.session.getSessionReviewPage() + 1);
         pagedList();
     }
@@ -299,7 +322,7 @@ public class ReviewController {
         sql.append("FROM `review` as A");
         sql.append("WHERE A.`contentId` = ?", Container.session.getSessionContent().getId());
         sql.append("ORDER BY regDate DESC");
-        sql.append("LIMIT ?, ?", Container.session.getSessionReviewPage()*Container.session.getSessionReviewItemsPerPage(), Container.session.getSessionReviewItemsPerPage());
+        sql.append("LIMIT ?, ?", Container.session.getSessionReviewPage() * Container.session.getSessionReviewItemsPerPage(), Container.session.getSessionReviewItemsPerPage());
 
         return DBUtil.selectRows(Container.connection, sql).size() != 0;
     }

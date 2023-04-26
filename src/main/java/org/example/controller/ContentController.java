@@ -11,8 +11,8 @@ public class ContentController {
     public void search() {
         // 컨텐츠 검색 과정
         System.out.println("-".repeat(24));
-        System.out.println("  검색어를 입력해주세요.");
-        System.out.printf("  >> ");
+        System.out.println("검색어를 입력해주세요.");
+        System.out.printf(">> ");
         String searchKeyward = Container.scanner.nextLine().trim();
 
         SecSql sql = new SecSql();
@@ -91,12 +91,12 @@ public class ContentController {
         }
 
         if(contentMapList.isEmpty()) {
-            System.out.printf("  입력하신 검색어 \"%s\"에 대한 검색 결과가 존재하지 않습니다.\n", searchKeyward);
+            System.out.printf("입력하신 검색어 \"%s\"에 대한 검색 결과가 존재하지 않습니다.\n", searchKeyward);
             return;
         }
 
         System.out.println("-".repeat(24));
-        System.out.printf("  입력하신 검색어 \"%s\"에 대한 검색 결과...\n\n", searchKeyward);
+        System.out.printf("입력하신 검색어 \"%s\"에 대한 검색 결과...\n\n", searchKeyward);
 
         List<Content> contentList = new ArrayList<>();
 
@@ -105,34 +105,34 @@ public class ContentController {
         }
 
         System.out.println("-".repeat(50));
-        System.out.println("  번호 / 컨텐츠이름 / 장르 / 개요 / 릴리즈");
+        System.out.println("번호 / 컨텐츠이름 / 장르 / 개요 / 릴리즈");
         System.out.println("-".repeat(50));
         for (Content content : contentList) {
-            System.out.printf("  %2d / %s / %s / %s / %s\n", content.getId(), content.getName(), content.getGenre(), content.getPlot(), content.getReleaseDate());
+            System.out.printf("%2d / %s / %s / %s / %s\n", content.getId(), content.getName(), content.getGenre(), content.getPlot(), content.getReleaseDate());
         }
 
         while (true) {
             try {
                 System.out.println("-".repeat(50));
-                System.out.println("  접속할 컨텐츠 번호를 입력해주세요.");
-                System.out.printf("  >> ");
+                System.out.println("접속할 컨텐츠 번호를 입력해주세요.");
+                System.out.printf(">> ");
                 int searchId = Container.scanner.nextInt();
                 Container.scanner.nextLine();
 
                 Content searchedContent = this.findContentById(searchId, contentList);
 
                 if (searchedContent == null) {
-                    System.out.println("  검색된 컨텐츠 번호가 아닙니다.");
+                    System.out.println("검색된 컨텐츠 번호가 아닙니다.");
                     continue;
                 }
 
-                System.out.printf("  \"%s\" 컨텐츠 게시판으로 이동합니다...\n\n", searchedContent.getName());
+                System.out.printf("\"%s\" 컨텐츠 게시판으로 이동합니다...\n\n", searchedContent.getName());
                 Container.session.setSessionContent(searchedContent);
                 detail();
                 break;
 
             } catch (InputMismatchException e) {
-                System.out.println("  컨텐츠 번호를 제대로 입력해주세요.");
+                System.out.println("컨텐츠 번호를 제대로 입력해주세요.");
                 Container.scanner.nextLine();
             }
         }
@@ -141,14 +141,14 @@ public class ContentController {
     public void detail() {
         Content content = Container.session.getSessionContent();
         System.out.printf("https://replix.io/content?id=%d\n\n", content.getId());
-        System.out.printf("       [%s]\n\n", content.getName());
-        System.out.printf("  제작사: %s\n", content.getProductionCompany());
-        System.out.printf("  감독: %s / 배우: %s\n", content.getDirector(), content.getCast());
-        System.out.printf("  장르: %s\n", content.getGenre());
-        System.out.printf("  개요: %s\n", content.getPlot());
-        System.out.printf("  릴리즈: %s\n", content.getReleaseDate());
-        System.out.printf("  OTT: %s\n", content.getOtt());
-        System.out.printf("  별점: %.2f / 리뷰: %d / 좋아요(%s): %d / 찜(%s): %d\n", content.getScore(), content.getReview(), isUserLike() ? "♥" : "♡", content.getLike(), isUserDibs() ? "★" : "☆", content.getDibs());
+        System.out.printf("[%s]\n\n", content.getName());
+        System.out.printf("제작사: %s\n", content.getProductionCompany());
+        System.out.printf("감독: %s / 배우: %s\n", content.getDirector(), content.getCast());
+        System.out.printf("장르: %s\n", content.getGenre());
+        System.out.printf("개요: %s\n", content.getPlot());
+        System.out.printf("릴리즈: %s\n", content.getReleaseDate());
+        System.out.printf("OTT: %s\n", content.getOtt());
+        System.out.printf("별점: %.2f / 리뷰: %d / 좋아요(%s): %d / 찜(%s): %d\n", content.getScore(), content.getReview(), isUserLike() ? "♥" : "♡", content.getLike(), isUserDibs() ? "★" : "☆", content.getDibs());
 
         Container.session.goToContent();
     }

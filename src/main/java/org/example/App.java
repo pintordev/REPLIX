@@ -27,7 +27,14 @@ public class App {
 
                 // action 메서드 실행
                 // 입력받은 명령어를 넘겨주고 doAction 메서드 내에서 적절한 수행이 이루어지도록 한다
-                doAction(Container.systemController.getCommand());
+                String command = Container.systemController.getCommand();
+                String commandKey = command.substring(0,1);
+
+                if (Container.systemController.menuMap.containsKey(commandKey)) {
+                    command = Container.systemController.menuMap.get(commandKey);
+                }
+
+                doAction(command);
 
             } catch (SQLException e) {
                 System.out.println("MySQL 연결 실패! 프로그램을 종료합니다.");
