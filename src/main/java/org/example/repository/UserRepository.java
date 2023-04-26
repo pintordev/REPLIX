@@ -129,4 +129,76 @@ public class UserRepository {
         System.out.printf("  이메일: %s\n", user.getEmail());
         System.out.printf("  가입일: %s\n", user.getRegDate().substring(0, 11));
     }
+
+    public void deleteUser(int id){
+        SecSql sql = new SecSql();
+
+        sql.append("DELETE FROM `review`");
+        sql.append("WHERE `review`.`userId` = ?", id);
+
+        DBUtil.delete(Container.connection, sql);
+
+        sql = new SecSql();
+        sql.append("DELETE FROM `reviewEvaluation`");
+        sql.append("WHERE `reviewEvaluation`.`userId` = ?", id);
+
+        DBUtil.delete(Container.connection, sql);
+
+        sql = new SecSql();
+        sql.append("DELETE FROM `favoriteGenre`");
+        sql.append("WHERE `favoriteGenre`.`userId` = ?", id);
+
+        DBUtil.delete(Container.connection, sql);
+
+        sql = new SecSql();
+        sql.append("DELETE FROM `likeContent`");
+        sql.append("WHERE `likeContent`.`userId` = ?", id);
+
+        DBUtil.delete(Container.connection, sql);
+
+        sql = new SecSql();
+        sql.append("DELETE FROM `dibsContent`");
+        sql.append("WHERE `dibsContent`.`userId` = ?", id);
+
+        DBUtil.delete(Container.connection, sql);
+
+        sql = new SecSql();
+        sql.append("DELETE FROM `user`");
+        sql.append("WHERE `id` = ?", id);
+
+        DBUtil.delete(Container.connection, sql);
+    }
+
+    public User findByUserId(String name, String email){
+        SecSql sql = new SecSql();
+
+        sql.append("SELECT *");
+        sql.append("FROM `user`");
+        sql.append("WHERE name = ?", name);
+        sql.append("AND email = ?", email);
+
+
+        Map<String, Object> userMap = DBUtil.selectRow(Container.connection, sql);
+
+        if(userMap.isEmpty()){
+            return null;
+        }
+        return new User(userMap);
+    }
+
+    public User findByUserPw(String name, String loginId, String email) {
+        SecSql sql = new SecSql();
+
+        sql.append("SELECT *");
+        sql.append("FROM `user`");
+        sql.append("WHERE name = ?", name);
+        sql.append("AND email = ?", email);
+        sql.append("AND loginId = ?",loginId);
+        Map<String, Object> userMap = DBUtil.selectRow(Container.connection, sql);
+
+        if(userMap.isEmpty()){
+            return null;
+        }
+        return new User(userMap);
+    }
 }

@@ -113,6 +113,15 @@ public class App {
             case "내가찜한컨텐츠":
                 Container.userController.userDibsContent();
                 break;
+            case "회원탈퇴":
+                Container.userController.deleteUser();
+                break;
+            case "아이디찾기":
+                Container.userController.userFindId();
+                break;
+            case "비밀번호찾기":
+                Container.userController.userFindPw();
+                break;
             default:
                 Container.systemController.commandError();
                 break;

@@ -45,4 +45,17 @@ public class UserService {
     public void getUserInformation(){
         userRepository.getUserInformation();
     }
+
+    public void deleteUser(int id){
+        userRepository.deleteUser(id);
+    }
+
+    public User findByUserId(String name, String email) {
+        return userRepository.findByUserId(name,email);
+    }
+
+    public User findByUserPw(String name, String loginId, String email) {
+        return userRepository.findByUserPw(name,loginId,email);
+    }
+
 }

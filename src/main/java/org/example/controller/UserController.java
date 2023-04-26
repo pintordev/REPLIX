@@ -509,9 +509,110 @@ public class UserController {
 
         System.out.println("  개인정보변경이 완료되었습니다.");
 
-        if(isLoginPwModified) {
+        if (isLoginPwModified) {
             System.out.println("  로그인 비밀번호가 변경되어 로그아웃됩니다. 다시 로그인 해주세요.");
             Container.session.logout();
+        }
+    }
+
+    public void deleteUser() {
+        if (Container.session.getSessionState() != 2) return;
+
+        String answer;
+
+        while (true) {
+            System.out.println("  정말 탈퇴하시겠습니까? (Y/N) [입력 종료: \"q;\"]");
+            System.out.printf("  >> ");
+            answer = Container.scanner.nextLine().trim().toLowerCase();
+
+            if (Container.systemController.isQuit(answer)) return;
+
+            if (!answer.equals("y") && !answer.equals("n")) {
+                System.out.println("  Y 또는 N 으로 입력해주세요.\n");
+            }
+
+            break;
+        }
+
+        if (answer.equals("n")) return;
+
+        System.out.printf("  %s님이 남겨주신 \"REPLIX\" 와의 좋은 추억 간직할게요. T.T\n", Container.session.getSessionUser().getName());
+
+        userService.deleteUser(Container.session.getSessionUser().getId());
+        Container.session.setSessionUser(null);
+        Container.session.setSessionState(0);
+    }
+
+    public void userFindId() {
+        System.out.println("이름을 입력해주세요.");
+        String name = Container.scanner.nextLine().trim();
+
+
+        while (true) {
+            System.out.println("가입시 사용했던 이메일을 입력해주세요.");
+            String email = Container.scanner.nextLine().trim();
+
+            if (!Pattern.matches("^\\w+\\.\\w+@\\w+\\.\\w+(\\.\\w+)?$", email) && !Pattern.matches("^\\w+@\\w+\\.\\w+(\\.\\w+)?$", email)) {
+                System.out.println("  올바른 이메일 양식으로 입력해주세요.\n");
+                continue;
+            }
+
+            User user = userService.findByUserId(name, email);
+
+            if (user == null) {
+                System.out.println("입력하신 정보와 일치하는 아이디가 존재하지않습니다.");
+                continue;
+            }
+
+            if (user.getEmail().equals(email) && user.getName().equals(name)) {
+                System.out.println(user.getLoginId());
+            }
+            break;
+        }
+
+    }
+
+    public void userFindPw() {
+        System.out.println("이름을 입력해주세요.");
+        String name = Container.scanner.nextLine().trim();
+
+        String certificationCode = "";
+        String inputCode;
+        while (true) {
+            System.out.println("로그인 아이디를 입력해주세요.");
+            String loginId = Container.scanner.nextLine().trim();
+            System.out.println("이메일주소를 입력해주세요.");
+            String email = Container.scanner.nextLine().trim();
+
+            if (!Pattern.matches("^\\w+\\.\\w+@\\w+\\.\\w+(\\.\\w+)?$", email) && !Pattern.matches("^\\w+@\\w+\\.\\w+(\\.\\w+)?$", email)) {
+                System.out.println("  올바른 이메일 양식으로 입력해주세요.\n");
+                continue;
+            }
+
+            User user = userService.findByUserPw(name, loginId, email);
+
+            if (user == null) {
+                System.out.println("입력하신 정보와 일치하는 아이디가 존재하지않습니다.");
+                continue;
+            }
+
+            certificationCode = new MailSender().emailCertification(email, "비밀번호 찾기");
+
+            System.out.println("\n  입력하신 이메일로 인증코드를 발송했습니다.");
+            System.out.println("  발송된 인증코드를 입력해주세요.");
+            System.out.printf("  >> ");
+            inputCode = Container.scanner.nextLine().trim();
+
+            if (!inputCode.equals(certificationCode)) {
+                System.out.println("  인증코드가 일치하지 않습니다. 다시 메일을 입력해주세요.\n");
+                continue;
+            }
+
+            System.out.println("  인증코드가 일치합니다. 이메일 인증이 완료되었습니다.");
+            System.out.printf("  %s님의 비밀번호: %s\n", user.getName(), user.getLoginPw());
+
+            break;
+
         }
     }
 
