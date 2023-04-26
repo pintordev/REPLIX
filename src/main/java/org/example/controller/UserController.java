@@ -5,11 +5,13 @@ import org.example.dto.Review;
 import org.example.dto.User;
 import org.example.service.UserService;
 import org.example.util.DBUtil;
+import org.example.util.MailSender;
 import org.example.util.SecSql;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 public class UserController {
     private UserService userService;
@@ -22,7 +24,7 @@ public class UserController {
         int loginLimit = 3;
         int loginTry = 0;
 
-        System.out.println("-".repeat(24));
+        System.out.println("-".repeat(30));
 
         while (true) {
             if (loginTry >= loginLimit) {
@@ -59,9 +61,7 @@ public class UserController {
             System.out.printf("  %s님 환영합니다.\n", user.getName());
             Container.session.login(user);
             break;
-
         }
-
     }
 
     public void logout() {
@@ -77,154 +77,250 @@ public class UserController {
         String birthDate;
         String gender;
         String email;
-        String inputGenre;
+        String favoriteGenre;
 
+        System.out.println("-".repeat(30));
         while (true) {
-            System.out.println("-".repeat(24));
-            System.out.println("  사용하실 로그인 아이디를 입력해주세요. (영문, 숫자)");
+            System.out.println("  사용하실 로그인 아이디를 입력해주세요. (영문, 숫자) [입력 종료: \"q;\"]");
             System.out.printf("  >> ");
             loginId = Container.scanner.nextLine().trim();
 
+            if (Container.systemController.isQuit(loginId)) return;
+
             if (loginId.length() == 0) {
-                System.out.println("  로그인 아이디를 입력하지 않았습니다.");
+                System.out.println("  로그인 아이디를 입력하지 않았습니다.\n");
                 continue;
             }
 
             if (loginId.replaceAll("[0-9a-zA-Z]", "").length() != 0) {
-                System.out.println("  아이디는 영문 또는 숫자로만 입력해주세요.");
+                System.out.println("  로그인 아이디는 영문, 숫자로만 입력해주세요.\n");
                 continue;
             }
 
-            boolean duplicateId = userService.duplicateId(loginId);
-
-            if (duplicateId) {
-                System.out.printf("  %s(은)는 이미 사용중인 아이디입니다.", loginId);
+            if (loginId.replaceAll("[0-9]", "").equals(loginId)) {
+                System.out.println("  로그인 아이디에 숫자는 반드시 포함되어야 합니다.\n");
                 continue;
             }
+
+            if (loginId.replaceAll("[a-zA-Z]", "").equals(loginId)) {
+                System.out.println("  로그인 아이디에 영문은 반드시 포함되어야 합니다.\n");
+                continue;
+            }
+
+            if (userService.duplicateId(loginId)) {
+                System.out.printf("  \"%s\" 는 이미 사용중인 로그인 아이디입니다. 다른 로그인 아이디로 회원가입을 시도해주세요.\n\n", loginId);
+                continue;
+            }
+
+            System.out.println("");
+
             break;
         }
 
         while (true) {
-            System.out.println("-".repeat(24));
-            System.out.println("  사용하실 로그인 비밀번호를 입력해주세요. (영문, 숫자, 특수문자, 8자리 이상)");
+            System.out.println("  사용하실 로그인 비밀번호를 입력해주세요. (영문, 숫자, 특수문자(!, @, #, $, %, ^, &, *), 8자리 이상) [입력 종료: \"q;\"]");
             System.out.printf("  >> ");
             loginPw = Container.scanner.nextLine().trim();
 
+            if (Container.systemController.isQuit(loginPw)) return;
+
             if (loginPw.length() == 0) {
-                System.out.println("  로그인 비밀번호를 입력하지 않았습니다.");
-                continue;
-            } else if (loginPw.replaceAll("[0-9a-zA-Z\s~!@#$%^&*()_+=]", "").length() != 0) {
-                System.out.println("  로그인 비밀번호는 영문, 숫자, 특수문자로만 입력해주세요.");
-                continue;
-            } else if (loginPw.length() < 8) {
-                System.out.println("  비밀번호는 8자리 이상으로 입력해주세요.");
+                System.out.println("  로그인 비밀번호를 입력하지 않았습니다.\n");
                 continue;
             }
 
-            boolean loginPwConfirmIssame = true;
+            if (loginPw.length() < 8) {
+                System.out.println("  로그인 비밀번호는 8자리 이상으로 입력해주세요.\n");
+                continue;
+            }
+
+            if (loginPw.replaceAll("[a-zA-z0-9$!$@#$$%^&*]", "").length() != 0) {
+                System.out.println("  로그인 비밀번호는 영문, 숫자, 특수문자(!, @, #, $, %, ^, &, *)로만 입력해주세요.\n");
+                continue;
+            }
+
+            if (loginPw.replaceAll("[0-9]", "").equals(loginPw)) {
+                System.out.println("  로그인 비밀번호에 숫자는 반드시 포함되어야 합니다.\n");
+                continue;
+            }
+
+            if (loginPw.replaceAll("[a-zA-Z]", "").equals(loginPw)) {
+                System.out.println("  로그인 비밀번호에 영문은 반드시 포함되어야 합니다.\n");
+                continue;
+            }
+
+            if (loginPw.replaceAll("[$!$@#$$%^&*]", "").equals(loginPw)) {
+                System.out.println("  로그인 비밀번호에 특수문자(!, @, #, $, %, ^, &, *)는 반드시 포함되어야 합니다.\n");
+                continue;
+            }
+
+            System.out.println("");
+
+            boolean isSameLoginPw = true;
 
             while (true) {
-                System.out.println("  로그인 비밀번호를 확인합니다.");
+                System.out.println("  입력하신 로그인 비밀번호를 다시 입력해주세요. [입력 종료: \"q;\"]");
                 System.out.printf("  >> ");
                 loginPwConfirm = Container.scanner.nextLine().trim();
 
+                if (Container.systemController.isQuit(loginPwConfirm)) return;
+
                 if (loginPwConfirm.length() == 0) {
-                    System.out.println("  비밀번호를 입력하지 않았습니다.");
+                    System.out.println("  로그인 비밀번호를 입력하지 않았습니다.\n");
                     continue;
                 }
 
-                if (loginPw.equals(loginPwConfirm) == false) {
-                    System.out.println("  입력하신 비밀번호가 일치하지 않습니다.");
-                    loginPwConfirmIssame = false;
-                    break;
+                if (!loginPw.equals(loginPwConfirm)) {
+                    System.out.println("  입력하신 로그인 비밀번호가 일치하지 않습니다.\n");
+                    isSameLoginPw = false;
+                    continue;
                 }
+
+                System.out.println("");
+
                 break;
             }
-            if (loginPwConfirmIssame) {
+
+            if (isSameLoginPw) {
                 break;
             }
         }
 
         while (true) {
-            System.out.println("  이름을 입력해주세요.");
+            System.out.println("  이름을 입력해주세요. [입력 종료: \"q;\"]");
             System.out.printf("  >> ");
             name = Container.scanner.nextLine().trim();
 
+            if (Container.systemController.isQuit(name)) return;
+
             if (name.length() == 0) {
-                System.out.println("  이름을 입력하지 않았습니다.");
+                System.out.println("  이름을 입력하지 않았습니다.\n");
                 continue;
             }
+
+            System.out.println("");
+
             break;
         }
 
         while (true) {
-            System.out.println("  생년월일을 입력해주세요. (yyyy-mm-dd)");
+            System.out.println("  생년월일을 입력해주세요. (yyyy-mm-dd) [입력 종료: \"q;\"]");
             System.out.printf("  >> ");
             birthDate = Container.scanner.nextLine().trim();
 
+            if (Container.systemController.isQuit(birthDate)) return;
+
             if (birthDate.length() == 0) {
-                System.out.println("  생년월일을 입력하지 않았습니다.");
+                System.out.println("  생년월일을 입력하지 않았습니다.\n");
                 continue;
             }
+
+            if (!Pattern.matches("^\\d{4}-\\d{2}-\\d{2}$", birthDate)) {
+                System.out.println("  올바른 생년월일 양식으로 입력해주세요. (yyyy-mm-dd)\n");
+                continue;
+            }
+
+            System.out.println("");
+
             break;
         }
 
         while (true) {
-            System.out.println("  성별을 입력해주세요. (남자/여자)");
+            System.out.println("  성별을 입력해주세요. (남자/여자) [입력 종료: \"q;\"]");
             System.out.printf("  >> ");
             gender = Container.scanner.nextLine().trim();
 
+            if (Container.systemController.isQuit(gender)) return;
+
             if (gender.length() == 0) {
-                System.out.println("  성별을 입력하지 않았습니다.");
+                System.out.println("  성별을 입력하지 않았습니다.\n");
                 continue;
             }
+
+            if (!gender.equals("남자") && !gender.equals("여자")) {
+                System.out.println("  남자 또는 여자만 입력해주세요.\n");
+                continue;
+            }
+
+            System.out.println("");
+
             break;
         }
 
+        String certificationCode = "";
+        String inputCode;
         while (true) {
-            System.out.println("  이메일 주소를 입력해주세요.");
+            System.out.println("  이메일 주소를 입력해주세요. [입력 종료: \"q;\"]");
             System.out.printf("  >> ");
             email = Container.scanner.nextLine().trim();
 
+            if (Container.systemController.isQuit(email)) return;
+
             if (email.length() == 0) {
-                System.out.println("  이메일 주소를 입력하지 않았습니다.");
+                System.out.println("  이메일 주소를 입력하지 않았습니다.\n");
                 continue;
             }
+
+            if (!Pattern.matches("^\\w+\\.\\w+@\\w+\\.\\w+(\\.\\w+)?$", email) && !Pattern.matches("^\\w+@\\w+\\.\\w+(\\.\\w+)?$", email)) {
+                System.out.println("  올바른 이메일 양식으로 입력해주세요.\n");
+                continue;
+            }
+
+            certificationCode = new MailSender().emailCertification(email, "가입");
+
+            System.out.println("\n  입력하신 이메일로 인증코드를 발송했습니다.");
+            System.out.println("  발송된 인증코드를 입력해주세요.");
+            System.out.printf("  >> ");
+            inputCode = Container.scanner.nextLine().trim();
+
+            if (!inputCode.equals(certificationCode)) {
+                System.out.println("  인증코드가 일치하지 않습니다. 다시 메일을 입력해주세요.\n");
+                continue;
+            }
+
+            System.out.println("  인증코드가 일치합니다. 이메일 인증이 완료되었습니다.\n");
+
             break;
         }
-
 
         while (true) {
             userService.printGenre();
-            System.out.println("-".repeat(24));
-            System.out.println("  선호 장르를 입력해주세요.");
+            System.out.println("  선호 장르를 입력해주세요. [입력 종료: \"q;\"]");
             System.out.printf("  >> ");
-            inputGenre = Container.scanner.nextLine().trim();
+            favoriteGenre = Container.scanner.nextLine().trim();
 
-            boolean isIngenre = userService.isIngenre(inputGenre);
+            if (Container.systemController.isQuit(favoriteGenre)) return;
 
-            if (inputGenre.length() == 0) {
-                System.out.println("  선호 장르를 입력하지 않았습니다.");
+            boolean isInGenre = userService.isIngenre(favoriteGenre);
+
+            if (favoriteGenre.length() == 0) {
+                System.out.println("  선호 장르를 입력하지 않았습니다.\n");
                 continue;
             }
 
-            if (!isIngenre) {
-                System.out.println("  입력하신 장르는 선택할 수 없습니다.");
+            if (!isInGenre) {
+                System.out.println("  입력하신 장르는 선택할 수 없습니다.\n");
                 continue;
             }
+
+            System.out.println("");
 
             break;
         }
 
-        int id = userService.signUp(loginId, loginPw, name, birthDate, gender, email);
-        userService.genreSignup(id, userService.findGenreIdByName(inputGenre));
+        System.out.println("  회원가입이 완료되었습니다.");
+        System.out.printf("  %s님 환영합니다.\n", name);
 
+        int id = userService.signUp(loginId, loginPw, name, birthDate, gender, email);
+        userService.genreSignup(id, userService.findGenreIdByName(favoriteGenre));
     }
 
     public void getUserInformation() {
-        if (Container.session.getSessionState() > 0) {
-            userService.getUserInformation();
+        if (Container.session.getSessionState() != 2) {
+            Container.systemController.commandError();
+            return;
         }
+        userService.getUserInformation();
     }
 
     public void modify() {

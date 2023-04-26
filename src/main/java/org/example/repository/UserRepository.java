@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 public class UserRepository {
-    public boolean duplicateId(String loginId){
+    public boolean duplicateId(String loginId) {
         SecSql sql = new SecSql();
 
         sql.append("SELECT COUNT(*) > 0");
@@ -19,7 +19,7 @@ public class UserRepository {
         return DBUtil.selectRowBooleanValue(Container.connection, sql);
     }
 
-    public void genreSignup(int userId, int genreId){
+    public void genreSignup(int userId, int genreId) {
         SecSql sql = new SecSql();
         sql.append("INSERT INTO `favoriteGenre`");
         sql.append("SET userId = ?", userId);
@@ -28,7 +28,7 @@ public class UserRepository {
         DBUtil.insert(Container.connection, sql);
     }
 
-    public int signUp(String loginId, String loginPw, String name, String birthDate, String gender, String email){
+    public int signUp(String loginId, String loginPw, String name, String birthDate, String gender, String email) {
         SecSql sql = new SecSql();
         sql.append("INSERT INTO `user`");
         sql.append("SET regDate = NOW()");
@@ -43,7 +43,7 @@ public class UserRepository {
         return DBUtil.insert(Container.connection, sql);
     }
 
-    public User findByLoginId(String loginId){
+    public User findByLoginId(String loginId) {
         SecSql sql = new SecSql();
 
         sql.append("SELECT *");
@@ -52,42 +52,48 @@ public class UserRepository {
 
         Map<String, Object> userMap = DBUtil.selectRow(Container.connection, sql);
 
-        if(userMap.isEmpty()){
+        if (userMap.isEmpty()) {
             return null;
         }
         return new User(userMap);
     }
 
-    public List<Map<String,Object>> findGenreAll(){
+    public List<Map<String, Object>> findGenreAll() {
         SecSql sql = new SecSql();
         sql.append("SELECT * FROM `genre`");
 
         return DBUtil.selectRows(Container.connection, sql);
     }
 
-    public void printGenre(){
-        for(Map<String, Object> genreMap : findGenreAll()){
-            System.out.println(genreMap.get("name"));
+    public void printGenre() {
+        System.out.println("  [장르 목록]");
+        System.out.printf("  ");
+        List<Map<String, Object>> genreMapList = findGenreAll();
+        for (int i = 0; i < genreMapList.size(); i++) {
+            System.out.printf("%s", genreMapList.get(i).get("name"));
+            if (i < genreMapList.size() - 1) {
+                System.out.printf(", ");
+            }
         }
+        System.out.println("");
     }
 
-    public boolean isIngenre(String inputGenre){
-        for(Map<String, Object> genreMap : findGenreAll()){
-            if(genreMap.get("name").equals(inputGenre))return true;
+    public boolean isIngenre(String inputGenre) {
+        for (Map<String, Object> genreMap : findGenreAll()) {
+            if (genreMap.get("name").equals(inputGenre)) return true;
         }
         return false;
     }
 
     public int findGenreIdByName(String inputGenre) {
-        for(Map<String, Object> genreMap : findGenreAll()){
-            if(genreMap.get("name").equals(inputGenre)) return (int) genreMap.get("id");
+        for (Map<String, Object> genreMap : findGenreAll()) {
+            if (genreMap.get("name").equals(inputGenre)) return (int) genreMap.get("id");
         }
         return -1;
     }
 
 
-
-    public User findByLoginPw(String loginPw){
+    public User findByLoginPw(String loginPw) {
         SecSql sql = new SecSql();
 
         sql.append("SELECT *");
@@ -96,13 +102,13 @@ public class UserRepository {
 
         Map<String, Object> userMap = DBUtil.selectRow(Container.connection, sql);
 
-        if(userMap.isEmpty()){
+        if (userMap.isEmpty()) {
             return null;
         }
         return new User(userMap);
     }
 
-    public void update(String newPw, String newEmail){
+    public void update(String newPw, String newEmail) {
         SecSql sql = new SecSql();
 
         sql.append("UPDATE `user`");
@@ -114,9 +120,9 @@ public class UserRepository {
         DBUtil.update(Container.connection, sql);
     }
 
-    public void getUserInformation(){
+    public void getUserInformation() {
         User user = Container.session.getSessionUser();
-        System.out.printf("\n       [%s님의 회원정보]       last updated at %s\n\n", user.getName(), user.getUpdateDate().substring(0, 11));
+        System.out.printf("\n  [%s님의 회원정보]       last updated at %s\n\n", user.getName(), user.getUpdateDate().substring(0, 11));
         System.out.printf("  성명: %s\n", user.getName());
         System.out.printf("  생년월일: %s\n", user.getBirthDate());
         System.out.printf("  성별: %s\n", user.getGender());

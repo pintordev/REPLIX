@@ -97,4 +97,12 @@ public class SystemController {
         Container.session.setSessionReviewPage(1);
         Container.session.setSessionState(1);
     }
+
+    public boolean isQuit(String command) {
+        if (command.equals("q;")) {
+            System.out.println("  입력을 종료합니다");
+            return true;
+        }
+        return false;
+    }
 }
